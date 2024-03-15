@@ -38,6 +38,83 @@ namespace SegmentTree {
         std::vector<Node> tree_;
         T base_value{};
     };
+
+    struct SegTree { // Segment tree with addition on segment and assignment on segment
+        explicit SegTree(const std::vector<int> &a)
+                : size_((int)a.size()), tree_(size_ << 2, 0), add_(size_ << 2, 0), push_(size_ << 2, -1) {}
+
+        void add(int l, int r, int value) {
+            add(1, 0, size_ - 1, l, r, (int64_t)value);
+        }
+
+        void update(int l, int r, int value) {
+            update(1, 0, size_ - 1, l, r, (int64_t)value);
+        }
+
+        int64_t get(int l, int r) {
+            return get(1, 0, size_ - 1, l, r);
+        }
+
+    private:
+        void push(int v, int l, int r) {
+            if (push_[v] != -1) {
+                if (l != r) {
+                    push_[v << 1] = push_[v << 1 | 1] = push_[v];
+                    add_[v << 1] = add_[v << 1 | 1] = 0;
+                }
+                tree_[v] = 1LL * push_[v] * (r - l + 1);
+            }
+
+            if (l != r) {
+                add_[v << 1] += add_[v];
+                add_[v << 1 | 1] += add_[v];
+            }
+            tree_[v] += 1LL * add_[v] * (r - l + 1);
+            add_[v] = 0;
+            push_[v] = -1;
+        }
+
+        int64_t get(int v, int tl, int tr, int l, int r) {
+            push(v, tl, tr);
+            if (l > r) { return 0; }
+            if (l == tl && r == tr) { return tree_[v]; }
+
+            int mid = (tl + tr) >> 1;
+            return get(v << 1, tl, mid, l, std::min(mid, r)) + get(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r);
+        }
+
+        void update(int v, int tl, int tr, int l, int r, int64_t value) {
+            push(v, tl, tr);
+            if (l > r) { return; }
+            if (l == tl && r == tr) {
+                push_[v] = value;
+                add_[v] = 0;
+                push(v, l, r);
+                return;
+            }
+            int mid = (tl + tr) >> 1;
+            update(v << 1, tl, mid, l, std::min(mid, r), value);
+            update(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
+            tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
+        }
+
+        void add(int v, int tl, int tr, int l, int r, int64_t value) {
+            push(v, tl, tr);
+            if (l > r) { return; }
+            if (l == tl && r == tr) {
+                add_[v] += value;
+                push(v, l, r);
+                return;
+            }
+            int mid = (tl + tr) >> 1;
+            add(v << 1, tl, mid, l, std::min(mid, r), value);
+            add(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
+            tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
+        }
+
+        int size_;
+        std::vector<int64_t> tree_, add_, push_;
+    };
 }
 
 
@@ -83,7 +160,7 @@ namespace Treap {
     };
 
 
-    class TTreap { // Implicit Treap with segment operations, reverse, remove
+    class ImpTTreap { // Implicit Treap with segment operations, reverse, remove
     public:
         void Insert(int key, int value) {
             assert(0 <= key);
@@ -246,7 +323,7 @@ namespace Treap {
 
 
     template<class T>
-    struct Treap { // Treap
+    struct TTreap { // Treap
         void Insert(int key) {
             auto [leftMid, right] = Split(Root_, key);
             auto [left, middle] = Split(leftMid, key - 1);
