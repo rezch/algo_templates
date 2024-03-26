@@ -79,11 +79,11 @@ signed main() {
 #ifndef ONLINE_JUDGE
     read("input.in");
     //write("output.out");
-    //test(3, solve, std::cin, std::cout);
+    test(3, solve, std::cin, std::cout);
 #else
-    solve_t(solve, std::cin, std::cout);
-    //test(1, solve, std::cin, std::cout);
+    test(1, solve, std::cin, std::cout);
 #endif
+    //solve_t(solve, std::cin, std::cout);
 
     return 0;
 }
