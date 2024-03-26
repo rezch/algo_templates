@@ -66,3 +66,53 @@ namespace combinatorics {
     }
 }
 
+
+namespace matrix {
+    int64_t mod = 1000000007;
+    const int size_ = 2;
+
+    class Matrix {
+    public:
+        int64_t data[size_][size_];
+
+        void clear() { memset(data, 0, sizeof(data)); }
+
+        void to_one() { data[0][0] = data[1][1] = 1; data[1][0] = data[0][1] = 0; }
+
+        Matrix operator+(const Matrix& other) const {
+            Matrix result{};
+            result.clear();
+            for (int i = 0; i < size_; ++i) {
+                for (int j = 0; j < size_; ++j) {
+                    result.data[i][j] = (data[i][j] + other.data[i][j]) % mod;
+                }
+            }
+            return result;
+        }
+
+        Matrix operator*(const Matrix& other) const {
+            Matrix result{};
+            result.clear();
+            for (int i = 0; i < size_; ++i) {
+                for (int j = 0; j < size_; ++j) {
+                    for (int k = 0; k < size_; ++k) {
+                        result.data[i][k] += (1LL * data[i][j] * other.data[j][k]);
+                        result.data[i][k] %= mod;
+                    }
+                }
+            }
+            return result;
+        }
+
+        Matrix power(int64_t n) {
+            Matrix result{}, temp = *this;
+            result.to_one();
+            for (; n > 0; n >>= 1) {
+                if (n & 1) { result = result * temp; }
+                temp = temp * temp;
+            }
+            return result;
+        }
+    };
+}
+
