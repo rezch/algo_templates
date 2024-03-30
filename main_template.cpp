@@ -16,6 +16,10 @@
         for (auto& var : list)
 #define mrng(vara, varb, ind1, ind2) \
         rng(vara, ind1) rng(varb, ind2)
+#define srng(var, to, step) \
+        for (int var = 0; (-1 + 2 * int(step > 0)) * var < (-1 + 2 * int(step > 0)) * to; var += step)
+#define asrng(var, from, to, step) \
+        for (int var = from; (-1 + 2 * int(step > 0)) * var < (-1 + 2 * int(step > 0)) * to; var += step)
 #define prints(list, ostream) \
         iter(var, list) { ostream << var << ' '; } ostream << std::endl;
 #define inputs(list, istream) iter(var, list) { istream >> var; }
@@ -40,7 +44,10 @@
 #define sw(a, b) std::swap(a, b);
 #define read(filename) freopen(filename, "r", stdin);
 #define write(filename) freopen(filename, "w", stdout);
+#define in std::cin
+#define out std::cout
 #define ret(x) std::cout << x << std::endl; return;
+#define sort(list) std::sort(list.begin(), list.end())
 
 template <class T> bool set_max(T& a, T b) { { if (a >= b) return false; } { a = b; return true; } }
 template <class T> bool set_min(T& a, T b) { { if (a <= b) return false; } { a = b; return true; } }
@@ -68,10 +75,10 @@ typedef vvt<int> vvi;
 // ------------------ SOLVE ------------------
 
 
-template <typename instream, typename outstream>
-void solve(instream& in, outstream& out) {
+void solve() {
 
 }
+
 
 signed main() {
     fast;
@@ -79,11 +86,11 @@ signed main() {
 #ifndef ONLINE_JUDGE
     read("input.in");
     //write("output.out");
-    test(3, solve, std::cin, std::cout);
+    test(4, solve);
 #else
-    test(1, solve, std::cin, std::cout);
+    test(1, solve);
 #endif
-    //solve_t(solve, std::cin, std::cout);
+    //solve_t(solve);
 
     return 0;
 }
