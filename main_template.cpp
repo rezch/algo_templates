@@ -28,6 +28,7 @@
 #define input(list) iter(var, list) { std::cin >> var; }
 #define pb push_back
 #define all(list) list.begin(), list.end()
+#define rall(list) list.rbegin(), list.rend()
 #define precision(n) std::fixed << std::setprecision(n)
 #define gcd(x, y) std::__gcd(x, y)
 #define lcm(x, y) (x * y / gcd(x, y))
@@ -37,9 +38,9 @@
             func(__VA_ARGS__);        \
             std::cout << std::endl;   \
         }}
-#define solve_t(func, in, out) { \
+#define solve_t(func) { \
         int t; in >> t;      \
-        for (int i = 0; i < t; ++i) { func(in, out); }}
+        for (int i = 0; i < t; ++i) { func(); }}
 #define clr(list, size) std::memset(&list, 0, sizeof(list[0]) * size);
 #define sw(a, b) std::swap(a, b);
 #define read(filename) freopen(filename, "r", stdin);
@@ -47,16 +48,18 @@
 #define in std::cin
 #define out std::cout
 #define ret(x) std::cout << x << std::endl; return;
-#define sort(list) std::sort(list.begin(), list.end())
+#define retn std::cout << std::endl; return;
+#define rsort_(list) std::sort(list.rbegin(), list.rend())
+#define sort_(list) std::sort(list.begin(), list.end())
 
-template <class T> bool set_max(T& a, T b) { { if (a >= b) return false; } { a = b; return true; } }
-template <class T> bool set_min(T& a, T b) { { if (a <= b) return false; } { a = b; return true; } }
+template <class T> inline bool set_max(T& a, T b) { { if (a >= b) return false; } { a = b; return true; } }
+template <class T> inline bool set_min(T& a, T b) { { if (a <= b) return false; } { a = b; return true; } }
 
-template <typename T, typename U> T ceil(T x, U y) { return (x > 0 ? (x + y - 1) / y : x / y); }
-template <typename T, typename U> T floor(T x, U y) { return (x > 0 ? x / y : (x - y + 1) / y); }
-int popcnt(int x) { return __builtin_popcount(x); }
-int topbit(int x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); } // 0 -> -1
-int lowbit(int x) { return (x == 0 ? -1 : __builtin_ctz(x)); } // 0 -> -1
+template <typename T, typename U> inline T ceil(T x, U y) { return (x > 0 ? (x + y - 1) / y : x / y); }
+template <typename T, typename U> inline T floor(T x, U y) { return (x > 0 ? x / y : (x - y + 1) / y); }
+inline int popcnt(int x) { return __builtin_popcount(x); }
+inline int topbit(int x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); } // 0 -> -1
+inline int lowbit(int x) { return (x == 0 ? -1 : __builtin_ctz(x)); } // 0 -> -1
 
 template <class T> using vt = std::vector<T>;
 template <class T> using vvt = std::vector<std::vector<T>>;
@@ -86,9 +89,9 @@ signed main() {
 #ifndef ONLINE_JUDGE
     read("input.in");
     //write("output.out");
-    test(4, solve);
+    test(69, solve);
 #else
-    test(1, solve);
+    test(420, solve);
 #endif
     //solve_t(solve);
 
