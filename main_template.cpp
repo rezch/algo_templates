@@ -90,14 +90,14 @@ template <class T, class U, class... W> void set(int n, T value, U& head, W&... 
 
 
 void solve() {
-    /* UwU */
+    /* 0w0 */
 }
 
 
 signed main() {
     fast;
 
-#ifndef ONLINE_JUDGE
+#ifdef UwU
     read("input.in");
     //write("output.out");
     test(111, solve);
