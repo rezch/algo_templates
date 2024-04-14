@@ -13,7 +13,7 @@ namespace DSU {
         }
 
         int head(int x) { // O(a(i)) ~ O(1)
-            return (x == p[x] ? x : p[x] = head(x));
+            return (x == p[x] ? x : p[x] = head(p[x]));
         }
 
         void unite(int a, int b) { // O(a(i)) ~ O(1)
