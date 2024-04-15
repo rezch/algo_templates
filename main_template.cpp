@@ -5,14 +5,20 @@
 
 #include <bits/stdc++.h>
 
+#define timer(func, ...) { \
+        auto start_time = std::chrono::steady_clock::now(); \
+        func();            \
+        auto end_time = std::chrono::steady_clock::now();   \
+        auto elapsed_ns = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time); \
+        std::cout << "Time elapsed: " << elapsed_ns.count() << " ms\n";                                 \
+        }
 #define test(test_count, func, ...) { \
         for (int i = 0; i < test_count; ++i) { \
-            func(__VA_ARGS__);        \
-            std::cout << std::endl;   \
+            timer(func, __VA_ARGS__);        \
         }}
 #define solve_t(func) { \
-        int t; in >> t;      \
-        for (int i = 0; i < t; ++i) { func(); }}
+int t; in >> t;      \
+for (int i = 0; i < t; ++i) { func(); }}
 #define fast std::cin.tie(0); \
         std::cout.tie(0); \
         std::ios_base::sync_with_stdio(0);
@@ -38,8 +44,8 @@
 #define input(list) iter(var, list) { std::cin >> var; }
 #define precision(n) std::fixed << std::setprecision(n)
 #define sort_(list) std::sort(list.begin(), list.end())
-#define write(filename) freopen(filename, "w", stdout);
-#define read(filename) freopen(filename, "r", stdin);
+#define writef(filename) freopen(filename, "w", stdout);
+#define readf(filename) freopen(filename, "r", stdin);
 #define ret(x) std::cout << x << std::endl; return;
 #define rall(list) list.rbegin(), list.rend()
 #define retn std::cout << std::endl; return;
@@ -47,6 +53,7 @@
 #define lcm(x, y) (x * y / std::__gcd(x, y))
 #define gcd(x, y) std::__gcd(x, y)
 #define sw(a, b) std::swap(a, b);
+#define cauto const auto&
 #define eb emplace_back
 #define out std::cout
 #define nl std::endl
@@ -77,20 +84,20 @@ typedef vt<pt<int>> vpi;
 typedef vvt<int> vvi;
 typedef vt<int> vi;
 
-void resize(int n) {};
-template <class T> void _resize(int n, T& list) { list.resize(n); };
-template <class T, class... U> void resize(int n, T& head, U&... tail) {
-    _resize(n, head); resize(n, tail...); };
+void write() { std::cout << std::endl; };
+template <class T> void write_(T& value) { std::cout << value << ' '; }
+template <class T, class... U> void write(T& head, U&... tail) { write_(head); write(tail...); }
+
 template <class T> void set(int n, T value) {};
-template <class T, class U> void _set(int n, T value, U& list) { list.assign(n, value); };
+template <class T, class U> void set(int n, T value, U& list) { list.assign(n, value); };
 template <class T, class U, class... W> void set(int n, T value, U& head, W&... tail) {
-    _set(n, value, head); set(n, value, tail...); };
+    set_(n, value, head); set(n, value, tail...); };
 
 // ------------------ SOLVE ------------------
 
 
 void solve() {
-    /* 0w0 */
+    /* OwO */
 }
 
 
@@ -98,11 +105,11 @@ signed main() {
     fast;
 
 #ifdef UwU
-    read("input.in");
-    //write("output.out");
-    test(111, solve);
-#else
+    readf("input.in");
+    //writef("output.out");
     test(1, solve);
+#else
+    solve();
 #endif
     //solve_t(solve);
 
