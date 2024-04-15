@@ -54,6 +54,7 @@ for (int i = 0; i < t; ++i) { func(); }}
 #define gcd(x, y) std::__gcd(x, y)
 #define sw(a, b) std::swap(a, b);
 #define cauto const auto&
+#define mp std::make_pair
 #define eb emplace_back
 #define out std::cout
 #define nl std::endl
@@ -84,9 +85,13 @@ typedef vt<pt<int>> vpi;
 typedef vvt<int> vvi;
 typedef vt<int> vi;
 
+void read() { };
+template <class T> void read_(T& value) { std::cin >> value; }
+template <class T, class... U> void read(T& head, U&... tail) { read_(head); read(tail...); }
+
 void write() { std::cout << std::endl; };
-template <class T> void write_(T& value) { std::cout << value << ' '; }
-template <class T, class... U> void write(T& head, U&... tail) { write_(head); write(tail...); }
+template <class T> void write_(T value) { std::cout << value << ' '; }
+template <class T, class... U> void write(T head, U... tail) { write_(head); write(tail...); }
 
 template <class T> void set(int n, T value) {};
 template <class T, class U> void set(int n, T value, U& list) { list.assign(n, value); };
@@ -97,7 +102,7 @@ template <class T, class U, class... W> void set(int n, T value, U& head, W&... 
 
 
 void solve() {
-    /* OwO */
+    /* UwU */
 }
 
 
@@ -109,11 +114,11 @@ signed main() {
     //writef("output.out");
     test(1, solve);
 #else
+    readf("unionday.in");
+    writef("unionday.out");
     solve();
 #endif
     //solve_t(solve);
 
     return 0;
 }
-
-
