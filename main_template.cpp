@@ -94,7 +94,7 @@ template <class T> void write_(T value) { std::cout << value << ' '; }
 template <class T, class... U> void write(T head, U... tail) { write_(head); write(tail...); }
 
 template <class T> void set(int n, T value) {};
-template <class T, class U> void set(int n, T value, U& list) { list.assign(n, value); };
+template <class T, class U> void set_(int n, T value, U& list) { list.assign(n, value); };
 template <class T, class U, class... W> void set(int n, T value, U& head, W&... tail) {
     set_(n, value, head); set(n, value, tail...); };
 
@@ -111,11 +111,11 @@ signed main() {
 
 #ifdef UwU
     readf("input.in");
-    //writef("output.out");
+//    writef("output.out");
     test(1, solve);
 #else
-    readf("unionday.in");
-    writef("unionday.out");
+//    readf("unionday.in");
+//    writef("unionday.out");
     solve();
 #endif
     //solve_t(solve);
