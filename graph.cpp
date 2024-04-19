@@ -54,7 +54,7 @@ namespace DSUrank {
 namespace DFS {
     void dfs(int v, std::vector<std::vector<int>>& g, std::vector<int>& used, int p = -1) { // O(n + m)
         // v - current vertex, p - parent
-        // g - adj list, used - vector of used vertexes (used[i] = 1 if the spfa was in vertex i)
+        // g - adj list
         used[v] = 1;
         for (const auto& to : g[v]) {
             if (used[to]) { continue; }
@@ -309,7 +309,6 @@ namespace PathFind {
         // The shortest path faster algorithm
         // v - current vert (in first call of spfa v - is the start vertex)
         // g - adj list (pair { end of edge, len of edge })
-        // used - vector of used vertexes (used[i] = 1 if the spfa was in vertex i)
         // d[i] - dist from s to i
         // flag = true if graph has negative cycle
         if (flag) {
