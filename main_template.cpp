@@ -15,9 +15,12 @@
         for (int i = 0; i < test_count; ++i) { \
             timer(func, __VA_ARGS__);        \
         }}
+#define ifout(statement, ok_msg, other_msg) {                \
+        if (statement) { std::cout << ok_msg << std::endl; } \
+        else { std::cout << other_msg << std::endl; } }
 #define solve_t(func) { \
-int t; in >> t;      \
-for (int i = 0; i < t; ++i) { func(); }}
+        int t; in >> t;      \
+        for (int i = 0; i < t; ++i) { func(); }}
 #define fast std::cin.tie(0); \
         std::cout.tie(0); \
         std::ios_base::sync_with_stdio(0);
@@ -93,7 +96,7 @@ template <class T> void write_(T value) { std::cout << value << ' '; }
 template <class T, class... U> void write(T head, U... tail) { write_(head); write(tail...); }
 
 template <class T> void set(int n, T value) {};
-template <class T, class U> void set_(int n, T value, U& list) { list.assign(n, value); };
+template <class T, class U> void set(int n, T value, U& list) { list.assign(n, value); };
 template <class T, class U, class... W> void set(int n, T value, U& head, W&... tail) {
     set_(n, value, head); set(n, value, tail...); };
 
