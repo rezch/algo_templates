@@ -1,6 +1,5 @@
-#ifndef LOCAL
+#ifndef UwU
 #pragma GCC optimize ("Ofast,unroll-loops")
-#pragma GCC target("avx2,popcnt,lzcnt,bmi,bmi2")
 #endif
 
 #include <bits/stdc++.h>
