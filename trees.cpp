@@ -40,8 +40,7 @@ namespace SegmentTree {
     };
 
     struct SegTree { // Segment tree with addition on segment and assignment on segment
-        explicit SegTree(const std::vector<int> &a)
-                : size_((int)a.size()), tree_(size_ << 2, 0), add_(size_ << 2, 0), push_(size_ << 2, -1) {}
+        explicit SegTree(int size) : size_(size), tree_(size_ << 2, 0), add_(size_ << 2, 0), push_(size_ << 2, -1) {}
 
         void add(int l, int r, int value) {
             add(1, 0, size_ - 1, l, r, (int64_t)value);
@@ -308,15 +307,15 @@ namespace Treap {
         int Merge(int left, int right) {
             if (left == -1) { return right; }
             if (right == -1) { return left; }
+            Push(left);
+            Push(right);
             if (Nodes_[left].Priority >= Nodes_[right].Priority) {
                 Nodes_[left].Right = Merge(Nodes_[left].Right, right);
                 UpdateCount(left);
-                Push(left);
                 return left;
             }
             Nodes_[right].Left = Merge(left, Nodes_[right].Left);
             UpdateCount(right);
-            Push(right);
             return right;
         }
     };
