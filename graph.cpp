@@ -6,7 +6,7 @@ namespace DSUsize {
 
     int p[SIZE], sz[SIZE];
 
-    void init(int n) {
+    void init(int n) { // O(n)
         for (int i = 0; i < n; ++i) {
             p[i] = i;
             sz[i] = 1;
@@ -31,7 +31,7 @@ namespace DSUrank {
 
     int p[SIZE], rank[SIZE];
 
-    void init(int n) {
+    void init(int n) { // O(n)
         std::memset(&rank, 0, n);
         for (int i = 0; i < n; ++i) {
             p[i] = i;
@@ -71,6 +71,47 @@ namespace DFS {
             }
         }
         sorted.push_back(v);
+    }
+}
+
+namespace Bridges { // O(n + m)
+    // find all bridges in an undirected graph, that may include multiple edges
+
+    // edges[a] = { { b, i } } - vert from a to b, i - index of edge
+    std::vector<std::vector<std::pair<int, int>>> edges;
+    std::vector<int> tin, tout, used;
+
+    // is_bridge[v][u] - true if v-u is bridge
+    std::unordered_map<int, std::unordered_map<int, int>> is_bridge;
+
+    void dfs(int vert, int parent, int& timer) { // find all bridges
+        used[vert] = true;
+        tin[vert] = tout[vert] = timer++;
+        for (const auto& to : edges[vert]) {
+            if (to.second == parent) {
+                continue;
+            }
+            if (used[to.first]) {
+                tout[vert] = std::min(tout[vert], tin[to.first]);
+            }
+            else {
+                dfs(to.first, to.second, timer);
+                tout[vert] = std::min(tout[vert], tout[to.first]);
+
+                if (tin[vert] < tout[to.first]) {
+                    is_bridge[vert][to.first] = 1;
+                    is_bridge[to.first][vert] = 1;
+                }
+            }
+        }
+    }
+
+    void FindBridges(int V) {
+        for (int i = 0; i < V; ++i) {
+            int timer = 0;
+            dfs(i, -1, timer);
+        }
+        // now is_bridges[v][u] = 1 (contains keys v, u) if v-u is bridge
     }
 }
 
