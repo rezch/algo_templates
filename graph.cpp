@@ -18,7 +18,8 @@ namespace DSUsize {
     }
 
     void unite(int a, int b) { // O(a(i)) ~ O(1)
-        a = head(a), b = head(b);
+        a = head(a); b = head(b);
+        if (a == b) { return; }
         if (sz[a] < sz[b]) { std::swap(a, b); }
         p[b] = a;
         sz[a] += sz[b];
@@ -27,7 +28,7 @@ namespace DSUsize {
 
 
 namespace DSUrank {
-    constexpr int SIZE = 8096;
+    constexpr int SIZE = 8192;
 
     int p[SIZE], rank[SIZE];
 
@@ -43,7 +44,8 @@ namespace DSUrank {
     }
 
     void unite(int a, int b) { // O(a(i)) ~ O(1)
-        a = head(a), b = head(b);
+        a = head(a); b = head(b);
+        if (a == b) { return; }
         if (rank[a] < rank[b]) { std::swap(a, b); }
         rank[a] = std::max(rank[a], rank[b] + 1);
         p[b] = a;
@@ -380,7 +382,7 @@ namespace Kruskal { // O(E logE)
     } edges[E];
 
     void MST() {
-        std::sort(&(*edges), &(*(edges + E)), [](const auto& l, const auto& r) {
+        std::sort(edges, edges + E, [](const auto& l, const auto& r) {
             const auto& [lu, lv, lw] = l;
             const auto& [ru, rv, rw] = r;
             if (lw != rw) {
@@ -402,7 +404,6 @@ namespace Kruskal { // O(E logE)
                 DSUrank::unite(u, v);
                 len += w;
                 ans.push_back(i);
-                ++cnt;
                 if (++cnt == V - 1) {
                     break;
                 }
