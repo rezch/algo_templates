@@ -86,6 +86,7 @@ typedef std::string str;
 typedef vt<pt<int>> vpi;
 typedef vvt<int> vvi;
 typedef vt<int> vi;
+typedef pt<int> pi;
 
 void read() { };
 template <class T> void read_(T& value) { std::cin >> value; }

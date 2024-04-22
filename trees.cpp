@@ -163,7 +163,7 @@ namespace Treap {
     public:
         void Insert(int key, int value) {
             assert(0 <= key);
-            assert(key < (int) Nodes_.size());
+            assert(key <= (int) Nodes_.size());
             if (freeCells.empty()) {
                 freeCells.push((int) Nodes_.size());
                 Nodes_.emplace_back();
@@ -185,12 +185,22 @@ namespace Treap {
             freeCells.push(keyTree);
         }
 
-        int GetMin() const {
-            return Nodes_[Root_].Min;
+        int GetMin(int l, int r) {
+            assert(0 <= l && l <= r && r < (int) Nodes_.size());
+            auto [left, middleRight] = Split(Root_, l - 1); // [0 l - 1] [l n]
+            auto [middle, right] = Split(middleRight, r - l); // [l r] [r + 1 n]
+            int res = Nodes_[middle].Min;
+            Root_ = Merge(left, Merge(middle, right));
+            return res;
         }
 
-        int GetMax() const {
-            return Nodes_[Root_].Max;
+        int GetMax(int l, int r) {
+            assert(0 <= l && l <= r && r < (int) Nodes_.size());
+            auto [left, middleRight] = Split(Root_, l - 1); // [0 l - 1] [l n]
+            auto [middle, right] = Split(middleRight, r - l); // [l r] [r + 1 n]
+            int res = Nodes_[middle].Max;
+            Root_ = Merge(left, Merge(middle, right));
+            return res;
         }
 
         void Reverse(int l, int r) {
@@ -268,8 +278,9 @@ namespace Treap {
             Nodes_[root].Count = 1 + GetCount(Nodes_[root].Left) + GetCount(Nodes_[root].Right);
         }
 
-        void Push(int current) {
-            if (current == -1) { return; }
+        void PushMinMax(int current) {
+            Nodes_[current].Min = Nodes_[current].Value;
+            Nodes_[current].Max = Nodes_[current].Value;
             if (Nodes_[current].Left != -1) { // Min/Max update
                 Nodes_[current].Min = std::min(Nodes_[current].Min, Nodes_[Nodes_[current].Left].Min);
                 Nodes_[current].Max = std::max(Nodes_[current].Max, Nodes_[Nodes_[current].Left].Max);
@@ -278,6 +289,11 @@ namespace Treap {
                 Nodes_[current].Min = std::min(Nodes_[current].Min, Nodes_[Nodes_[current].Right].Min);
                 Nodes_[current].Max = std::max(Nodes_[current].Max, Nodes_[Nodes_[current].Right].Max);
             }
+        }
+
+        void Push(int current) {
+            if (current == -1) { return; }
+            PushMinMax(current);
             if (!Nodes_[current].Reverse) { return; } // Reverse update
             Nodes_[current].Reverse = false;
             std::swap(Nodes_[current].Left, Nodes_[current].Right);
@@ -286,21 +302,21 @@ namespace Treap {
         }
 
         std::pair<int, int> Split(int current, int key) {
-            Push(current);
             if (current == -1) { return {-1, -1}; }
+            Push(current);
             int currentKey = GetCount(Nodes_[current].Left);
             if (currentKey <= key) {
                 key -= (currentKey + 1);
                 auto [rightLeft, rightRight] = Split(Nodes_[current].Right, key);
                 Nodes_[current].Right = rightLeft;
                 UpdateCount(current);
-                Push(rightRight);
+                Push(current);
                 return {current, rightRight};
             }
             auto [leftLeft, leftRight] = Split(Nodes_[current].Left, key);
             Nodes_[current].Left = leftRight;
             UpdateCount(current);
-            Push(leftLeft);
+            Push(current);
             return {leftLeft, current};
         }
 
@@ -312,10 +328,12 @@ namespace Treap {
             if (Nodes_[left].Priority >= Nodes_[right].Priority) {
                 Nodes_[left].Right = Merge(Nodes_[left].Right, right);
                 UpdateCount(left);
+                Push(left);
                 return left;
             }
             Nodes_[right].Left = Merge(left, Nodes_[right].Left);
             UpdateCount(right);
+            Push(right);
             return right;
         }
     };

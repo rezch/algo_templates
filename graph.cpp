@@ -6,8 +6,8 @@ namespace DSUsize {
 
     int p[SIZE], sz[SIZE];
 
-    void init(int n) { // O(n)
-        for (int i = 0; i < n; ++i) {
+    void init(int size) { // O(n)
+        for (int i = 0; i < size; ++i) {
             p[i] = i;
             sz[i] = 1;
         }
@@ -32,9 +32,9 @@ namespace DSUrank {
 
     int p[SIZE], rank[SIZE];
 
-    void init(int n) { // O(n)
-        std::memset(&rank, 0, n);
-        for (int i = 0; i < n; ++i) {
+    void init(int size) { // O(n)
+        std::memset(&rank, 0, size);
+        for (int i = 0; i < size; ++i) {
             p[i] = i;
         }
     }
