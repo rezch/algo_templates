@@ -604,8 +604,8 @@ namespace SAT2 { // O(n + m)
             int a = clauses[i].first, b = clauses[i].second;
             int pos_a = n + abs(a), neg_a = abs(a);
             int pos_b = abs(b), neg_b = n + abs(b);
-            if (a < 0) { sw(pos_a, neg_a); }
-            if (b < 0) { sw(pos_b, neg_b); }
+            if (a < 0) { std::swap(pos_a, neg_a); }
+            if (b < 0) { std::swap(pos_b, neg_b); }
             g[pos_a].push_back(pos_b);
             g[neg_b].push_back(neg_a);
             gt[pos_b].push_back(pos_a);
