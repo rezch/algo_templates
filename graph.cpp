@@ -169,8 +169,7 @@ namespace BFS {
 
 
 namespace LCA_DFS {
-    constexpr int MAXN = (int)1e6;
-    constexpr int MAXLG = 20;
+    constexpr int MAXN = 131072, MAXLG = 17; // LOG = log(MAXN, 2)
 
     int sparse[MAXN][MAXLG];
     std::vector<std::vector<int>> g;
@@ -211,12 +210,12 @@ namespace LCA_DFS {
 
 
 namespace LCA_dynamic {
-    constexpr int LOG = 25, MAXN = 133700;
+    constexpr int MAXN = 131072, LOG = 17; // LOG = log(MAXN, 2)
 
     int parent[MAXN], depth[MAXN];
     int up[MAXN][LOG];
 
-    void clear() {
+    void init() {
         for (int j = 1; j < LOG; ++j) {
             for (int i = 1; i < MAXN; ++i) {
                 up[i][j] = up[up[i][j - 1]][j - 1];
@@ -562,5 +561,82 @@ namespace Boruvka { // O(E logV) (for planar graphs: ~O(n))
                 }
             }
         }
+    }
+}
+
+
+namespace SAT2 { // O(n + m)
+    std::vector<std::vector<int>> g, gt; // 1 indexing
+    std::vector<int> used, usedt, scc; // 1 indexing
+    std::stack<int> topsort_order;
+    int color = 1;
+
+    // get inverse topsort vertex order
+    void topsort(int v) {
+        used[v] = 1;
+        for (const auto& to : g[v]) {
+            if (!used[to]) {
+                topsort(to);
+            }
+        }
+        topsort_order.push(v);
+    }
+
+    // color vertexes by their scc's
+    void color_scc(int v) {
+        usedt[v] = 1;
+        for (const auto& to : gt[v]) {
+            if (!usedt[to]) {
+                color_scc(to);
+            }
+        }
+        scc[v] = color;
+    }
+
+    bool solve(int n, int m, std::vector<std::pair<int, int>>& clauses, std::vector<int>& solution) {
+        // n, m - number of variables and 2-CNF clauses in formula
+        // solution - vector to write the solution if it exists (0 - indexing)
+
+        // transform 2-CNF pairs to implication edges
+        g.resize(n << 1 | 1);
+        gt.resize(n << 1 | 1);
+        for (int i = 0; i < m; ++i) {
+            int a = clauses[i].first, b = clauses[i].second;
+            int pos_a = n + abs(a), neg_a = abs(a);
+            int pos_b = abs(b), neg_b = n + abs(b);
+            if (a < 0) { sw(pos_a, neg_a); }
+            if (b < 0) { sw(pos_b, neg_b); }
+            g[pos_a].push_back(pos_b);
+            g[neg_b].push_back(neg_a);
+            gt[pos_b].push_back(pos_a);
+            gt[neg_a].push_back(neg_b);
+        }
+        // topsort
+        used.assign(n << 1 | 1, 0);
+        for (int i = 1; i < (n << 1); ++i) {
+            if (!used[i]) {
+                topsort(i);
+            }
+        }
+        // coloring formula variables by their scc in implication graph
+        usedt.assign(n << 1 | 1, 0);
+        scc.resize(n << 1 | 1);
+        while (!topsort_order.empty()) {
+            int v = topsort_order.top();
+            topsort_order.pop();
+            if (!usedt[v]) {
+                color_scc(v);
+                ++color;
+            }
+        }
+        // check the existence of a formula solution and finding the solution
+        solution.assign(n, false);
+        for (int i = 1; i < n; ++i) {
+            if (scc[i] == scc[i + n]) { // a and not(a) in the same scc
+                return false;
+            }
+            solution[i - 1] = int(scc[i] > scc[i + n]);
+        }
+        return true;
     }
 }

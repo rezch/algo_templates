@@ -42,72 +42,72 @@ namespace SegmentTree {
     struct SegTree { // Segment tree with addition on segment and assignment on segment
         explicit SegTree(int size) : size_(size), tree_(size_ << 2, 0), add_(size_ << 2, 0), push_(size_ << 2, -1) {}
 
-        void add(int l, int r, int value) {
-            add(1, 0, size_ - 1, l, r, (int64_t)value);
+        void Add(int l, int r, int value) {
+            Add(1, 0, size_ - 1, l, r, (int64_t)value);
         }
 
-        void update(int l, int r, int value) {
-            update(1, 0, size_ - 1, l, r, (int64_t)value);
+        void Set(int l, int r, int value) {
+            Set(1, 0, size_ - 1, l, r, (int64_t)value);
         }
 
-        int64_t get(int l, int r) {
-            return get(1, 0, size_ - 1, l, r);
+        int64_t Get(int l, int r) {
+            return Get(1, 0, size_ - 1, l, r);
         }
 
     private:
-        void push(int v, int l, int r) {
-            if (push_[v] != -1) {
+        void Push(int v, int l, int r) {
+            if (push_[v] != -1) { // push push
                 if (l != r) {
                     push_[v << 1] = push_[v << 1 | 1] = push_[v];
                     add_[v << 1] = add_[v << 1 | 1] = 0;
                 }
                 tree_[v] = 1LL * push_[v] * (r - l + 1);
+                push_[v] = -1;
             }
 
-            if (l != r) {
+            if (l != r) { // push add
                 add_[v << 1] += add_[v];
                 add_[v << 1 | 1] += add_[v];
             }
             tree_[v] += 1LL * add_[v] * (r - l + 1);
             add_[v] = 0;
-            push_[v] = -1;
         }
 
-        int64_t get(int v, int tl, int tr, int l, int r) {
-            push(v, tl, tr);
+        int64_t Get(int v, int tl, int tr, int l, int r) {
+            Push(v, tl, tr);
             if (l > r) { return 0; }
             if (l == tl && r == tr) { return tree_[v]; }
 
             int mid = (tl + tr) >> 1;
-            return get(v << 1, tl, mid, l, std::min(mid, r)) + get(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r);
+            return Get(v << 1, tl, mid, l, std::min(mid, r)) + Get(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r);
         }
 
-        void update(int v, int tl, int tr, int l, int r, int64_t value) {
-            push(v, tl, tr);
+        void Set(int v, int tl, int tr, int l, int r, int64_t value) {
+            Push(v, tl, tr);
             if (l > r) { return; }
             if (l == tl && r == tr) {
                 push_[v] = value;
                 add_[v] = 0;
-                push(v, l, r);
+                Push(v, l, r);
                 return;
             }
             int mid = (tl + tr) >> 1;
-            update(v << 1, tl, mid, l, std::min(mid, r), value);
-            update(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
+            Set(v << 1, tl, mid, l, std::min(mid, r), value);
+            Set(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
             tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
         }
 
-        void add(int v, int tl, int tr, int l, int r, int64_t value) {
-            push(v, tl, tr);
+        void Add(int v, int tl, int tr, int l, int r, int64_t value) {
+            Push(v, tl, tr);
             if (l > r) { return; }
             if (l == tl && r == tr) {
                 add_[v] += value;
-                push(v, l, r);
+                Push(v, l, r);
                 return;
             }
             int mid = (tl + tr) >> 1;
-            add(v << 1, tl, mid, l, std::min(mid, r), value);
-            add(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
+            Add(v << 1, tl, mid, l, std::min(mid, r), value);
+            Add(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
             tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
         }
 
