@@ -2,7 +2,7 @@
 
 
 namespace DSUsize {
-    constexpr int SIZE = 8096;
+    constexpr int SIZE = 131072;
 
     int p[SIZE], sz[SIZE];
 
@@ -28,7 +28,7 @@ namespace DSUsize {
 
 
 namespace DSUrank {
-    constexpr int SIZE = 8192;
+    constexpr int SIZE = 131072;
 
     int p[SIZE], rank[SIZE];
 
@@ -593,15 +593,14 @@ namespace SAT2 { // O(n + m)
         scc[v] = color;
     }
 
-    bool solve(int n, int m, std::vector<std::pair<int, int>>& clauses, std::vector<int>& solution) {
-        // n, m - number of variables and 2-CNF clauses in formula
+    bool solve(int n, std::vector<std::pair<int, int>>& clauses, std::vector<int>& solution) {
+        // n - number of variables and 2-CNF clauses in formula
         // solution - vector to write the solution if it exists (0 - indexing)
 
         // transform 2-CNF pairs to implication edges
         g.resize(n << 1 | 1);
         gt.resize(n << 1 | 1);
-        for (int i = 0; i < m; ++i) {
-            int a = clauses[i].first, b = clauses[i].second;
+        for (auto& [a, b] : clauses) {
             int pos_a = n + abs(a), neg_a = abs(a);
             int pos_b = abs(b), neg_b = n + abs(b);
             if (a < 0) { std::swap(pos_a, neg_a); }
@@ -613,7 +612,7 @@ namespace SAT2 { // O(n + m)
         }
         // topsort
         used.assign(n << 1 | 1, 0);
-        for (int i = 1; i < (n << 1); ++i) {
+        for (int i = 1; i <= (n << 1); ++i) {
             if (!used[i]) {
                 topsort(i);
             }
@@ -631,7 +630,7 @@ namespace SAT2 { // O(n + m)
         }
         // check the existence of a formula solution and finding the solution
         solution.assign(n, false);
-        for (int i = 1; i < n; ++i) {
+        for (int i = 1; i <= n; ++i) {
             if (scc[i] == scc[i + n]) { // a and not(a) in the same scc
                 return false;
             }
