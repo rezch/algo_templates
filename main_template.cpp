@@ -6,7 +6,7 @@
 
 #define timer(func, ...) { \
         auto start_time = std::chrono::steady_clock::now(); \
-        func();            \
+        func(__VA_ARGS__);            \
         auto end_time = std::chrono::steady_clock::now();   \
         auto elapsed_ns = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time); \
         std::cout << "Time elapsed: " << elapsed_ns.count() << " ms\n";                                 \
