@@ -597,6 +597,10 @@ namespace SAT2 { // O(n + m)
         // n - number of variables and 2-CNF clauses in formula
         // solution - vector to write the solution if it exists (0 - indexing)
 
+        g.clear(); gt.clear();
+        used.clear(); usedt.clear(); scc.clear();
+        color = 1;
+
         // transform 2-CNF pairs to implication edges
         g.resize(n << 1 | 1);
         gt.resize(n << 1 | 1);
