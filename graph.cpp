@@ -463,7 +463,6 @@ namespace Prime { // O(m log n)
     constexpr int INF = 100000000;
 
     struct Edge {
-        Edge() = default;
         int from{}, to{}, w{};
     } edges[MAXE];
 
@@ -487,7 +486,7 @@ namespace Prime { // O(m log n)
             dist[i] = INF;
         }
         dist[0] = 0;
-        q.push({ 0, 0 });
+        q.push(Edge({ 0, 0, 0 }));
 
         int cnt = 0;
         while (!q.empty()) {
@@ -524,7 +523,6 @@ namespace Boruvka { // O(E logV) (for planar graphs: ~O(n))
     constexpr int MAXE = 50000;
 
     struct Edge {
-        Edge() = default;
         int a{}, b{}, w{};
     } edges[MAXE];
 
@@ -596,6 +594,8 @@ namespace SAT2 { // O(n + m)
     bool solve(int n, std::vector<std::pair<int, int>>& clauses, std::vector<int>& solution) {
         // n - number of variables and 2-CNF clauses in formula
         // solution - vector to write the solution if it exists (0 - indexing)
+        // Example: clauses = { {-1, -2}, {-3, 2} } <=> (1 | !2) & (!3 | 2) (1, 2, 3 - var_1, var_2, var_3)
+        // solution - { 1, 0, 0 } <=> var_1 = true, var_2 = false, var_3 = false;
 
         g.clear(); gt.clear();
         used.clear(); usedt.clear(); scc.clear();
@@ -642,4 +642,8 @@ namespace SAT2 { // O(n + m)
         }
         return true;
     }
+
+    // a xor b <=> (a | b) & (!a | !b)
+    // a xnor b <=> (!a | b) & (a | !b) (a <-> b)
+    // a -> b <=> (!a | b)
 }
