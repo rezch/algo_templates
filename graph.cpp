@@ -54,13 +54,13 @@ namespace DSUrank {
 
 
 namespace DFS {
-    void dfs(int v, std::vector<std::vector<int>>& g, std::vector<int>& used, int p = -1) { // O(n + m)
+    void dfs(int v, std::vector<std::vector<int>>& g, std::vector<int>& used) { // O(n + m)
         // v - current vertex, p - parent
         // g - adj list
         used[v] = 1;
         for (const auto& to : g[v]) {
             if (used[to]) { continue; }
-            dfs(to, g, used, v);
+            dfs(to, g, used);
         }
     }
 
@@ -475,7 +475,7 @@ namespace Prime { // O(m log n)
         }
     };
 
-    void MST(int V, int E, std::vector<std::vector<Edge>>& edges) {
+    void MST(int V, std::vector<std::vector<Edge>>& edges) {
         // edges[V] = { edges from V to other vertexes }
         int64_t len = 0; // len of MST edges
         std::vector<std::pair<int, int>> ans; // MST edges
@@ -565,7 +565,7 @@ namespace Boruvka { // O(E logV) (for planar graphs: ~O(n))
 
 namespace SAT2 { // O(n + m)
     std::vector<std::vector<int>> g, gt; // 1 indexing
-    std::vector<int> used, usedt, scc; // 1 indexing
+    std::vector<int> used, scc; // 1 indexing
     std::stack<int> topsort_order;
     int color = 1;
 
@@ -582,13 +582,12 @@ namespace SAT2 { // O(n + m)
 
     // color vertexes by their scc's
     void color_scc(int v) {
-        usedt[v] = 1;
+        scc[v] = color;
         for (const auto& to : gt[v]) {
-            if (!usedt[to]) {
+            if (!scc[to]) {
                 color_scc(to);
             }
         }
-        scc[v] = color;
     }
 
     bool solve(int n, std::vector<std::pair<int, int>>& clauses, std::vector<int>& solution) {
@@ -598,7 +597,7 @@ namespace SAT2 { // O(n + m)
         // solution - { 1, 0, 0 } <=> var_1 = true, var_2 = false, var_3 = false;
 
         g.clear(); gt.clear();
-        used.clear(); usedt.clear(); scc.clear();
+        used.clear(); scc.clear();
         color = 1;
 
         // transform 2-CNF pairs to implication edges
@@ -622,12 +621,11 @@ namespace SAT2 { // O(n + m)
             }
         }
         // coloring formula variables by their scc in implication graph
-        usedt.assign(n << 1 | 1, 0);
         scc.resize(n << 1 | 1);
         while (!topsort_order.empty()) {
             int v = topsort_order.top();
             topsort_order.pop();
-            if (!usedt[v]) {
+            if (!scc[v]) {
                 color_scc(v);
                 ++color;
             }
@@ -646,4 +644,170 @@ namespace SAT2 { // O(n + m)
     // a xor b <=> (a | b) & (!a | !b)
     // a xnor b <=> (!a | b) & (a | !b) (a <-> b)
     // a -> b <=> (!a | b)
+}
+
+namespace HLD { // preproccessing O(n), operations O(log^2(n))
+    // hld with add, set & get on tree ways
+    constexpr int MAXN = (1 << 17);
+
+    std::vector<int> g[MAXN];
+    int sz[MAXN], p[MAXN], tin[MAXN], tout[MAXN], used[MAXN], head[MAXN];
+    int t = 0;
+    int size_;
+    std::vector<int64_t> tree_, add_, push_;
+
+    // SegTree
+
+    void STPush(int v, int l, int r) {
+        if (push_[v] != -1) { // push
+            if (l != r) {
+                push_[v << 1] = push_[v << 1 | 1] = push_[v];
+                add_[v << 1] = add_[v << 1 | 1] = 0;
+            }
+            tree_[v] = 1LL * push_[v] * (r - l + 1);
+            push_[v] = -1;
+        }
+
+        if (l != r) { // push add
+            add_[v << 1] += add_[v];
+            add_[v << 1 | 1] += add_[v];
+        }
+        tree_[v] += 1LL * add_[v] * (r - l + 1);
+        add_[v] = 0;
+    }
+
+    int64_t STGet(int v, int tl, int tr, int l, int r) {
+        STPush(v, tl, tr);
+        if (l > r) { return 0; }
+        if (l == tl && r == tr) { return tree_[v]; }
+
+        int mid = (tl + tr) >> 1;
+        return STGet(v << 1, tl, mid, l, std::min(mid, r)) + STGet(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r);
+    }
+
+    void STSet(int v, int tl, int tr, int l, int r, int64_t value) {
+        STPush(v, tl, tr);
+        if (l > r) { return; }
+        if (l == tl && r == tr) {
+            push_[v] = value;
+            add_[v] = 0;
+            STPush(v, l, r);
+            return;
+        }
+        int mid = (tl + tr) >> 1;
+        STSet(v << 1, tl, mid, l, std::min(mid, r), value);
+        STSet(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
+        tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
+    }
+
+    void STAdd(int v, int tl, int tr, int l, int r, int64_t value) {
+        STPush(v, tl, tr);
+        if (l > r) { return; }
+        if (l == tl && r == tr) {
+            add_[v] += value;
+            STPush(v, l, r);
+            return;
+        }
+        int mid = (tl + tr) >> 1;
+        STAdd(v << 1, tl, mid, l, std::min(mid, r), value);
+        STAdd(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
+        tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
+    }
+
+    // HLD
+
+    inline bool ancestor (int a, int b) { return tin[a] <= tin[b] && tin[b] < tout[a]; }
+
+    void _up_get(int& a, int& b, int64_t& ans) {
+        while (!ancestor(head[a], b)) {
+            ans += STGet(1, 0, size_ - 1, tin[head[a]], tin[a]);
+            a = p[head[a]];
+        }
+    }
+
+    void _up_add(int& a, int& b, int64_t value) {
+        while (!ancestor(head[a], b)) {
+            STAdd(1, 0, size_ - 1, tin[head[a]], tin[a], value);
+            a = p[head[a]];
+        }
+    }
+
+    void _up_set(int& a, int& b, int64_t value) {
+        while (!ancestor(head[a], b)) {
+            STSet(1, 0, size_ - 1, tin[head[a]], tin[a], value);
+            a = p[head[a]];
+        }
+    }
+
+    void _set_sizes(int v = 0) {
+        sz[v] = 1;
+        for (auto &to: g[v]) {
+            if (p[to] == -1 && to) {
+                p[to] = v;
+                _set_sizes(to);
+                sz[v] += sz[to];
+                if (sz[to] > sz[g[v][0]]) { // to - heaviest child
+                    std::swap(to, g[v][0]);
+                }
+            }
+        }
+    }
+
+    void _build_hld(int v = 0) {
+        used[v] = 1;
+        tin[v] = t++;
+        for (const auto &to: g[v]) {
+            if (used[to]) { continue; }
+            // to - is heaviest -> head[v] else to
+            head[to] = (to == g[v][0] ? head[v] : to);
+            _build_hld(to);
+        }
+        tout[v] = t;
+    }
+
+    // using functions
+
+    void add_edge(int a, int b) { // add edge to tree
+        g[a].push_back(b);
+        g[b].push_back(a);
+    }
+
+    void prepare_hld(int n) { // n - number of tree vertexes
+        std::memset(&p, -1, n << 2);
+        _set_sizes();
+        std::memset(&used, 0, n);
+        _build_hld();
+        size_ = n + 1;
+        tree_.resize(size_ << 2, 0);
+        add_.resize(size_ << 2, 0);
+        push_.resize(size_ << 2, -1);
+    }
+
+    void Add(int a, int b, int64_t value) { // add value to all vertexes on way a-b
+        _up_add(a, b, value);
+        _up_add(b, a, value);
+        if (!ancestor(a, b)) {
+            std::swap(a, b);
+        }
+        STAdd(1, 0, size_ - 1, tin[a], tin[b], value);
+    }
+
+    void Set(int a, int b, int64_t value) { // set value to all vertexes on way a-b
+        _up_set(a, b, value);
+        _up_set(b, a, value);
+        if (!ancestor(a, b)) {
+            std::swap(a, b);
+        }
+        STSet(1, 0, size_ - 1, tin[a], tin[b], value);
+    }
+
+    int64_t Get(int a, int b) { // get sum of values from all vertexes on way a-b
+        int64_t ans = 0;
+        _up_get(a, b, ans);
+        _up_get(b, a, ans);
+        if (!ancestor(a, b)) {
+            std::swap(a, b);
+        }
+        return ans + STGet(1, 0, size_ - 1, tin[a], tin[b]);
+    }
 }

@@ -4,7 +4,7 @@
 namespace SegmentTree {
     template <class T>
     struct BitSegTree { // segment tree with binary inner calculation
-        explicit BitSegTree(const std::vector<T> &a) : size_(a.size()), tree_(size_ << 1) {
+        explicit BitSegTree(const std::vector<T> &a) : size_(a.size()), tree_(size_ << 2) {
             for (int i = 0; i < size_; ++i) { tree_[i + size_].value_ = a[i]; }
             for (int i = size_ - 1; i > 0; --i) { tree_[i] = merge(tree_[i << 1], tree_[i << 1 | 1]); }
         }
