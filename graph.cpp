@@ -686,8 +686,8 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
     int sz[MAXN], p[MAXN], tin[MAXN], tout[MAXN], used[MAXN], head[MAXN];
     int t = 0;
     int size_;
-    std::vector<T> tree_, add_, push_, raw_data_;
-    std::vector<bool> push_used_;
+    T tree_[MAXN << 2], add_[MAXN << 2], push_[MAXN << 2], raw_data_[MAXN];
+    bool push_used_[MAXN << 2];
 
     void STBuild(int v = 1, int l = 0, int r = size_ - 1) {
         if (l == r) {
@@ -727,7 +727,7 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
         return merge(
                 STGet(v << 1, tl, mid, l, std::min(mid, r)),
                 STGet(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r)
-                );
+        );
     }
 
     void STSet(int v, int tl, int tr, int l, int r, T value) {
@@ -822,12 +822,11 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
         std::memset(&p, -1, n << 2);
         _set_sizes();
         size_ = n;
-        tree_.resize(size_ << 2);
-        add_.resize(size_ << 2, base_add_value);
-        push_.resize(size_ << 2);
-        push_used_.resize(size_ << 2, false);
+        for (int i = 0; i < size_ << 2; ++i) {
+            add_[i] = base_add_value;
+            push_used_[i] = false;
+        }
         std::memset(&used, 0, n);
-        raw_data_.resize(n);
         _build_hld(0, vals);
         STBuild();
     }
