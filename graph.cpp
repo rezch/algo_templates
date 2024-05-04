@@ -672,7 +672,7 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
     T mapping(const T& a, int k) {
         // using to get value on segment that contains k equals values
         // seg = [ val, val, ..., val - k times ] -> seg = mapping(val, k)
-        return k * a;
+        return a * k;
     }
 
     T add_merge(const T& a, const T& b) { // merging values that adding to nodes segments
@@ -681,7 +681,7 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
         return a + b;
     }
 
-    // ------------------------------------
+    // ************************ inner function ************************
     std::vector<int> g[MAXN];
     int sz[MAXN], p[MAXN], tin[MAXN], tout[MAXN], used[MAXN], head[MAXN];
     int t = 0;
@@ -797,6 +797,18 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
         }
     }
 
+    void _build_hld(int v) {
+        used[v] = 1;
+        tin[v] = t++;
+        for (const auto &to: g[v]) {
+            if (used[to]) { continue; }
+            // to - is heaviest -> head[v] else to
+            head[to] = (to == g[v][0] ? head[v] : to);
+            _build_hld(to);
+        }
+        tout[v] = t;
+    }
+
     void _build_hld(int v, std::vector<T>& vals) {
         used[v] = 1;
         tin[v] = t++;
@@ -815,6 +827,19 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
     void add_edge(int a, int b) { // add edge to tree
         g[a].push_back(b);
         g[b].push_back(a);
+    }
+
+    void prepare_hld(int n) { // prepare hld
+        // n - number of tree vertexes
+        std::memset(&p, -1, n << 2);
+        _set_sizes();
+        size_ = n;
+        for (int i = 0; i < size_ << 2; ++i) {
+            add_[i] = base_add_value;
+            push_used_[i] = false;
+        }
+        std::memset(&used, 0, n);
+        _build_hld(0);
     }
 
     void prepare_hld(int n, std::vector<T>& vals) { // prepare hld
