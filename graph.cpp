@@ -648,91 +648,135 @@ namespace SAT2 { // O(n + m)
 
 namespace HLD { // preproccessing O(n), operations O(log^2(n))
     // hld with add, set & get on tree ways
-    constexpr int MAXN = (1 << 17);
 
+    constexpr int MAXN = (1 << 17);
+    // maximum tree nodes count
+
+    using T = int64_t;
+    // tree nodes type
+
+    T negative_value = {};
+    // such value that combines(X, negative_value) == X
+    // using in get for empty returns
+
+    T base_add_value = {};
+    // such value that add_merge(node, base_val) = node
+    // using to fill segment add value to default
+
+    T merge(const T& a, const T& b) {
+        // using to merge two segments
+        // seg = merge(seg_left, seg_right)
+        return a + b;
+    }
+
+    T mapping(const T& a, int k) {
+        // using to get value on segment that contains k equals values
+        // seg = [ val, val, ..., val - k times ] -> seg = mapping(val, k)
+        return k * a;
+    }
+
+    T add_merge(const T& a, const T& b) { // merging values that adding to nodes segments
+        // using to merge segment add_
+        // seg_add = add_merge(seg_add_left + seg_add_right)
+        return a + b;
+    }
+
+    // ------------------------------------
     std::vector<int> g[MAXN];
     int sz[MAXN], p[MAXN], tin[MAXN], tout[MAXN], used[MAXN], head[MAXN];
     int t = 0;
     int size_;
-    std::vector<int64_t> tree_, add_, push_;
+    std::vector<T> tree_, add_, push_, raw_data_;
+    std::vector<bool> push_used_;
 
-    // SegTree
+    void STBuild(int v = 1, int l = 0, int r = size_ - 1) {
+        if (l == r) {
+            tree_[v] = raw_data_[l];
+            return;
+        }
+        int mid = (l + r) >> 1;
+        STBuild(v << 1, l, mid);
+        STBuild(v << 1 | 1, mid + 1, r);
+        tree_[v] = merge(tree_[v], tree_[v << 1]);
+        tree_[v] = merge(tree_[v], tree_[v << 1 | 1]);
+    }
 
     void STPush(int v, int l, int r) {
-        if (push_[v] != -1) { // push
+        if (push_used_[v]) { // push
             if (l != r) {
+                push_used_[v << 1] = push_used_[v << 1 | 1] = true;
                 push_[v << 1] = push_[v << 1 | 1] = push_[v];
-                add_[v << 1] = add_[v << 1 | 1] = 0;
+                add_[v << 1] = add_[v << 1 | 1] = base_add_value;
             }
-            tree_[v] = 1LL * push_[v] * (r - l + 1);
-            push_[v] = -1;
+            tree_[v] = mapping(push_[v], r - l + 1);
+            push_used_[v] = false;
         }
-
         if (l != r) { // push add
-            add_[v << 1] += add_[v];
-            add_[v << 1 | 1] += add_[v];
+            add_[v << 1] = add_merge(add_[v << 1], add_[v]);
+            add_[v << 1 | 1] = add_merge(add_[v << 1 | 1], add_[v]);
         }
-        tree_[v] += 1LL * add_[v] * (r - l + 1);
-        add_[v] = 0;
+        tree_[v] = merge(tree_[v], mapping(add_[v], r - l + 1));
+        add_[v] = base_add_value;
     }
 
-    int64_t STGet(int v, int tl, int tr, int l, int r) {
+    T STGet(int v, int tl, int tr, int l, int r) {
         STPush(v, tl, tr);
-        if (l > r) { return 0; }
+        if (l > r) { return negative_value; }
         if (l == tl && r == tr) { return tree_[v]; }
-
         int mid = (tl + tr) >> 1;
-        return STGet(v << 1, tl, mid, l, std::min(mid, r)) + STGet(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r);
+        return merge(
+                STGet(v << 1, tl, mid, l, std::min(mid, r)),
+                STGet(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r)
+                );
     }
 
-    void STSet(int v, int tl, int tr, int l, int r, int64_t value) {
+    void STSet(int v, int tl, int tr, int l, int r, T value) {
         STPush(v, tl, tr);
         if (l > r) { return; }
         if (l == tl && r == tr) {
+            push_used_[v] = true;
             push_[v] = value;
-            add_[v] = 0;
+            add_[v] = base_add_value;
             STPush(v, l, r);
             return;
         }
         int mid = (tl + tr) >> 1;
         STSet(v << 1, tl, mid, l, std::min(mid, r), value);
         STSet(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
-        tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
+        tree_[v] = merge(tree_[v << 1], tree_[v << 1 | 1]);
     }
 
-    void STAdd(int v, int tl, int tr, int l, int r, int64_t value) {
+    void STAdd(int v, int tl, int tr, int l, int r, T value) {
         STPush(v, tl, tr);
         if (l > r) { return; }
         if (l == tl && r == tr) {
-            add_[v] += value;
+            add_[v] = add_merge(add_[v], value);
             STPush(v, l, r);
             return;
         }
         int mid = (tl + tr) >> 1;
         STAdd(v << 1, tl, mid, l, std::min(mid, r), value);
         STAdd(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
-        tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
+        tree_[v] = merge(tree_[v << 1], tree_[v << 1 | 1]);
     }
-
-    // HLD
 
     inline bool ancestor (int a, int b) { return tin[a] <= tin[b] && tin[b] < tout[a]; }
 
-    void _up_get(int& a, int& b, int64_t& ans) {
+    void _up_get(int& a, int& b, T& ans) {
         while (!ancestor(head[a], b)) {
-            ans += STGet(1, 0, size_ - 1, tin[head[a]], tin[a]);
+            ans = merge(ans, STGet(1, 0, size_ - 1, tin[head[a]], tin[a]));
             a = p[head[a]];
         }
     }
 
-    void _up_add(int& a, int& b, int64_t value) {
+    void _up_add(int& a, int& b, T value) {
         while (!ancestor(head[a], b)) {
             STAdd(1, 0, size_ - 1, tin[head[a]], tin[a], value);
             a = p[head[a]];
         }
     }
 
-    void _up_set(int& a, int& b, int64_t value) {
+    void _up_set(int& a, int& b, T value) {
         while (!ancestor(head[a], b)) {
             STSet(1, 0, size_ - 1, tin[head[a]], tin[a], value);
             a = p[head[a]];
@@ -753,37 +797,42 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
         }
     }
 
-    void _build_hld(int v = 0) {
+    void _build_hld(int v, std::vector<T>& vals) {
         used[v] = 1;
         tin[v] = t++;
+        raw_data_[tin[v]] = vals[v];
         for (const auto &to: g[v]) {
             if (used[to]) { continue; }
             // to - is heaviest -> head[v] else to
             head[to] = (to == g[v][0] ? head[v] : to);
-            _build_hld(to);
+            _build_hld(to, vals);
         }
         tout[v] = t;
     }
 
-    // using functions
+    // ************************ main function ************************
 
     void add_edge(int a, int b) { // add edge to tree
         g[a].push_back(b);
         g[b].push_back(a);
     }
 
-    void prepare_hld(int n) { // n - number of tree vertexes
+    void prepare_hld(int n, std::vector<T>& vals) { // prepare hld
+        // n - number of tree vertexes
         std::memset(&p, -1, n << 2);
         _set_sizes();
+        size_ = n;
+        tree_.resize(size_ << 2);
+        add_.resize(size_ << 2, base_add_value);
+        push_.resize(size_ << 2);
+        push_used_.resize(size_ << 2, false);
         std::memset(&used, 0, n);
-        _build_hld();
-        size_ = n + 1;
-        tree_.resize(size_ << 2, 0);
-        add_.resize(size_ << 2, 0);
-        push_.resize(size_ << 2, -1);
+        raw_data_.resize(n);
+        _build_hld(0, vals);
+        STBuild();
     }
 
-    void Add(int a, int b, int64_t value) { // add value to all vertexes on way a-b
+    void Add(int a, int b, T value) { // add value to all vertexes on way a-b
         _up_add(a, b, value);
         _up_add(b, a, value);
         if (!ancestor(a, b)) {
@@ -792,7 +841,7 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
         STAdd(1, 0, size_ - 1, tin[a], tin[b], value);
     }
 
-    void Set(int a, int b, int64_t value) { // set value to all vertexes on way a-b
+    void Set(int a, int b, T value) { // set value to all vertexes on way a-b
         _up_set(a, b, value);
         _up_set(b, a, value);
         if (!ancestor(a, b)) {
@@ -801,13 +850,13 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
         STSet(1, 0, size_ - 1, tin[a], tin[b], value);
     }
 
-    int64_t Get(int a, int b) { // get sum of values from all vertexes on way a-b
-        int64_t ans = 0;
+    T Get(int a, int b) { // get sum of values from all vertexes on way a-b
+        T ans = negative_value;
         _up_get(a, b, ans);
         _up_get(b, a, ans);
         if (!ancestor(a, b)) {
             std::swap(a, b);
         }
-        return ans + STGet(1, 0, size_ - 1, tin[a], tin[b]);
+        return merge(ans, STGet(1, 0, size_ - 1, tin[a], tin[b]));
     }
 }
