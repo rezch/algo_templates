@@ -63,6 +63,11 @@ namespace SegmentTree {
             return a + b;
         }
 
+        T merge_with_add(const T& a, const T& add) { // merge add with segment
+            // seg = merge_with(seg, add)
+            return a + add;
+        }
+
         explicit SegTree(int size)
                 : size_(size),
                   tree_(size_ << 2, negative_value),
@@ -118,7 +123,7 @@ namespace SegmentTree {
                 add_[v << 1] = add_merge(add_[v << 1], add_[v]);
                 add_[v << 1 | 1] = add_merge(add_[v << 1 | 1], add_[v]);
             }
-            tree_[v] = merge(tree_[v], mapping(add_[v], r - l + 1));
+            tree_[v] = merge_with_add(tree_[v], mapping(add_[v], r - l + 1));
             add_[v] = base_add_value;
         }
 
