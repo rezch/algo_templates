@@ -2,7 +2,7 @@
 
 
 namespace DSUsize {
-    constexpr int SIZE = 131072;
+    constexpr int SIZE = (1 << 17);
 
     int p[SIZE], sz[SIZE];
 
@@ -24,11 +24,15 @@ namespace DSUsize {
         p[b] = a;
         sz[a] += sz[b];
     }
+
+    inline bool same(int a, int b) {
+        return head(a) == head(b);
+    }
 }
 
 
 namespace DSUrank {
-    constexpr int SIZE = 131072;
+    constexpr int SIZE = (1 << 17);
 
     int p[SIZE], rank[SIZE];
 
@@ -49,6 +53,10 @@ namespace DSUrank {
         if (rank[a] < rank[b]) { std::swap(a, b); }
         rank[a] = std::max(rank[a], rank[b] + 1);
         p[b] = a;
+    }
+
+    inline bool same(int a, int b) {
+        return head(a) == head(b);
     }
 }
 
@@ -75,6 +83,7 @@ namespace DFS {
         sorted.push_back(v);
     }
 }
+
 
 namespace Bridges { // O(n + m)
     // find all bridges in an undirected graph, that may include multiple edges
@@ -116,6 +125,7 @@ namespace Bridges { // O(n + m)
         // now is_bridges[v][u] = 1 (contains keys v, u) if v-u is bridge
     }
 }
+
 
 namespace BFS {
 
@@ -169,7 +179,7 @@ namespace BFS {
 
 
 namespace LCA_DFS {
-    constexpr int MAXN = 131072, MAXLG = 17; // LOG = log(MAXN, 2)
+    constexpr int MAXN = (1 << 17), MAXLG = 17; // LOG = log(MAXN, 2)
 
     int sparse[MAXN][MAXLG];
     std::vector<std::vector<int>> g;
@@ -210,7 +220,7 @@ namespace LCA_DFS {
 
 
 namespace LCA_dynamic {
-    constexpr int MAXN = 131072, LOG = 17; // LOG = log(MAXN, 2)
+    constexpr int MAXN = (1 << 17), LOG = 17; // LOG = log(MAXN, 2)
 
     int parent[MAXN], depth[MAXN];
     int up[MAXN][LOG];
@@ -373,7 +383,7 @@ namespace PathFind {
 
 
 namespace Kruskal { // O(E logE)
-    constexpr int V = 500, E = 10000;
+    constexpr int V = (1 << 17), E = (1 << 17);
 
     struct Edge {
         Edge() = default;
@@ -413,7 +423,7 @@ namespace Kruskal { // O(E logE)
 
 
 namespace PrimeSqrt { // O(V^2) (only for full graphs)
-    constexpr int MAXN = 1e5;
+    constexpr int MAXN = (1 << 17);
     int used[MAXN];
     int best_edge[MAXN];
     int64_t min_edge[MAXN];
@@ -459,7 +469,7 @@ namespace PrimeSqrt { // O(V^2) (only for full graphs)
 
 
 namespace Prime { // O(m log n)
-    constexpr int MAXV = 50000, MAXE = 50000;
+    constexpr int MAXV = (1 << 17), MAXE = (1 << 17);
     constexpr int INF = 100000000;
 
     struct Edge {
@@ -520,7 +530,7 @@ namespace Prime { // O(m log n)
 
 
 namespace Boruvka { // O(E logV) (for planar graphs: ~O(n))
-    constexpr int MAXE = 50000;
+    constexpr int MAXE = (1 << 17);
 
     struct Edge {
         int a{}, b{}, w{};
@@ -645,6 +655,7 @@ namespace SAT2 { // O(n + m)
     // a xnor b <=> (!a | b) & (a | !b) (a <-> b)
     // a -> b <=> (!a | b)
 }
+
 
 namespace HLD { // preproccessing O(n), operations O(log^2(n))
     // hld with add, set & get on tree ways

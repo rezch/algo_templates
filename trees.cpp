@@ -39,80 +39,134 @@ namespace SegmentTree {
         T base_value{};
     };
 
+    template <class T>
     struct SegTree { // Segment tree with addition on segment and assignment on segment
-        explicit SegTree(int size) : size_(size), tree_(size_ << 2, 0), add_(size_ << 2, 0), push_(size_ << 2, -1) {}
+        T negative_value = {}; // such value that combines(X, negative_value) == X
+        // using in get for empty returns
 
-        void Add(int l, int r, int value) {
-            Add(1, 0, size_ - 1, l, r, (int64_t)value);
+        T base_add_value = {}; // such value that add_merge(node, base_val) = node
+        // using to fill segment add value to default
+
+        T merge(const T& a, const T& b) { // using to merge two segments
+            // seg = merge(seg_left, seg_right)
+            return a + b;
         }
 
-        void Set(int l, int r, int value) {
-            Set(1, 0, size_ - 1, l, r, (int64_t)value);
+        T mapping(const T& a, int k) { // using to get value on segment that contains k equals values
+            // seg = [ val, val, ..., val - k times ] -> seg = mapping(val, k)
+            return a * k;
         }
 
-        int64_t Get(int l, int r) {
+        T add_merge(const T& a, const T& b) { // merging values that adding to nodes segments
+            // using to merge segment add_
+            // seg_add = add_merge(seg_add_left + seg_add_right)
+            return a + b;
+        }
+
+        explicit SegTree(int size)
+                : size_(size),
+                  tree_(size_ << 2, negative_value),
+                  add_(size_ << 2, base_add_value),
+                  push_(size_ << 2, negative_value),
+                  push_used_(size_ << 2, false) {}
+
+        explicit SegTree(std::vector<T>& data)
+                : size_(data.size()),
+                  tree_(size_ << 2, 0),
+                  add_(size_ << 2, base_add_value),
+                  push_(size_ << 2, negative_value),
+                  push_used_(size_ << 2, false) {
+            Build(1, 0, size_ - 1, data);
+        }
+
+        void Add(int l, int r, T value) {
+            Add(1, 0, size_ - 1, l, r, value);
+        }
+
+        void Set(int l, int r, T value) {
+            Set(1, 0, size_ - 1, l, r, value);
+        }
+
+        T Get(int l, int r) {
             return Get(1, 0, size_ - 1, l, r);
         }
 
     private:
-        void Push(int v, int l, int r) {
-            if (push_[v] != -1) { // push push
-                if (l != r) {
-                    push_[v << 1] = push_[v << 1 | 1] = push_[v];
-                    add_[v << 1] = add_[v << 1 | 1] = 0;
-                }
-                tree_[v] = 1LL * push_[v] * (r - l + 1);
-                push_[v] = -1;
+        void Build(int v, int l, int r, std::vector<T>& data) {
+            if (l == r) {
+                tree_[v] = data[l];
+                return;
             }
-
-            if (l != r) { // push add
-                add_[v << 1] += add_[v];
-                add_[v << 1 | 1] += add_[v];
-            }
-            tree_[v] += 1LL * add_[v] * (r - l + 1);
-            add_[v] = 0;
+            int mid = (l + r) >> 1;
+            Build(v << 1, l, mid, data);
+            Build(v << 1 | 1, mid + 1, r, data);
+            tree_[v] = merge(tree_[v], tree_[v << 1]);
+            tree_[v] = merge(tree_[v], tree_[v << 1 | 1]);
         }
 
-        int64_t Get(int v, int tl, int tr, int l, int r) {
+        void Push(int v, int l, int r) {
+            if (push_used_[v]) { // push
+                if (l != r) {
+                    push_used_[v << 1] = push_used_[v << 1 | 1] = true;
+                    push_[v << 1] = push_[v << 1 | 1] = push_[v];
+                    add_[v << 1] = add_[v << 1 | 1] = base_add_value;
+                }
+                tree_[v] = mapping(push_[v], r - l + 1);
+                push_used_[v] = false;
+            }
+            if (l != r) { // push add
+                add_[v << 1] = add_merge(add_[v << 1], add_[v]);
+                add_[v << 1 | 1] = add_merge(add_[v << 1 | 1], add_[v]);
+            }
+            tree_[v] = merge(tree_[v], mapping(add_[v], r - l + 1));
+            add_[v] = base_add_value;
+        }
+
+        T Get(int v, int tl, int tr, int l, int r) {
             Push(v, tl, tr);
-            if (l > r) { return 0; }
+            if (l > r) { return negative_value; }
             if (l == tl && r == tr) { return tree_[v]; }
 
             int mid = (tl + tr) >> 1;
-            return Get(v << 1, tl, mid, l, std::min(mid, r)) + Get(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r);
+            return merge(
+                    Get(v << 1, tl, mid, l, std::min(mid, r)),
+                    Get(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r)
+            );
         }
 
-        void Set(int v, int tl, int tr, int l, int r, int64_t value) {
+        void Set(int v, int tl, int tr, int l, int r, T value) {
             Push(v, tl, tr);
             if (l > r) { return; }
             if (l == tl && r == tr) {
+                push_used_[v] = true;
                 push_[v] = value;
-                add_[v] = 0;
+                add_[v] = base_add_value;
                 Push(v, l, r);
                 return;
             }
             int mid = (tl + tr) >> 1;
             Set(v << 1, tl, mid, l, std::min(mid, r), value);
             Set(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
-            tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
+            tree_[v] = merge(tree_[v << 1], tree_[v << 1 | 1]);
         }
 
-        void Add(int v, int tl, int tr, int l, int r, int64_t value) {
+        void Add(int v, int tl, int tr, int l, int r, T value) {
             Push(v, tl, tr);
             if (l > r) { return; }
             if (l == tl && r == tr) {
-                add_[v] += value;
+                add_[v] = add_merge(add_[v], value);
                 Push(v, l, r);
                 return;
             }
             int mid = (tl + tr) >> 1;
             Add(v << 1, tl, mid, l, std::min(mid, r), value);
             Add(v << 1 | 1, mid + 1, tr, std::max(mid + 1, l), r, value);
-            tree_[v] = tree_[v << 1] + tree_[v << 1 | 1];
+            tree_[v] = merge(tree_[v << 1], tree_[v << 1 | 1]);
         }
 
         int size_;
-        std::vector<int64_t> tree_, add_, push_;
+        std::vector<T> tree_, add_, push_;
+        std::vector<bool> push_used_;
     };
 }
 
