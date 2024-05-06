@@ -41,7 +41,7 @@ namespace SegmentTree {
 
     template <class T>
     struct SegTree { // Segment tree with addition on segment and assignment on segment
-        T negative_value = {}; // such value that combines(X, negative_value) == X
+        T base_value = {}; // such value that combines(X, negative_value) == X
         // using in get for empty returns
 
         T base_add_value = {}; // such value that add_merge(node, base_val) = node
@@ -70,16 +70,16 @@ namespace SegmentTree {
 
         explicit SegTree(int size)
                 : size_(size),
-                  tree_(size_ << 2, negative_value),
+                  tree_(size_ << 2, base_value),
                   add_(size_ << 2, base_add_value),
-                  push_(size_ << 2, negative_value),
+                  push_(size_ << 2, base_value),
                   push_used_(size_ << 2, false) {}
 
         explicit SegTree(std::vector<T>& data)
                 : size_(data.size()),
-                  tree_(size_ << 2, 0),
+                  tree_(size_ << 2, base_value),
                   add_(size_ << 2, base_add_value),
-                  push_(size_ << 2, negative_value),
+                  push_(size_ << 2, base_value),
                   push_used_(size_ << 2, false) {
             Build(1, 0, size_ - 1, data);
         }
@@ -129,7 +129,7 @@ namespace SegmentTree {
 
         T Get(int v, int tl, int tr, int l, int r) {
             Push(v, tl, tr);
-            if (l > r) { return negative_value; }
+            if (l > r) { return base_value; }
             if (l == tl && r == tr) { return tree_[v]; }
 
             int mid = (tl + tr) >> 1;
