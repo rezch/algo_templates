@@ -47,23 +47,23 @@ namespace SegmentTree {
         T base_add_value = {}; // such value that add_merge(node, base_val) = node
         // using to fill segment add value to default
 
-        T merge(const T& a, const T& b) { // using to merge two segments
+        static T merge(const T& a, const T& b) { // using to merge two segments
             // seg = merge(seg_left, seg_right)
             return a + b;
         }
 
-        T mapping(const T& a, int k) { // using to get value on segment that contains k equals values
+        static T mapping(const T& a, int k) { // using to get value on segment that contains k equals values
             // seg = [ val, val, ..., val - k times ] -> seg = mapping(val, k)
             return a * k;
         }
 
-        T add_merge(const T& a, const T& b) { // merging values that adding to nodes segments
+        static T add_merge(const T& a, const T& b) { // merging values that adding to nodes segments
             // using to merge segment add_
             // seg_add = add_merge(seg_add_left + seg_add_right)
             return a + b;
         }
 
-        T merge_with_add(const T& a, const T& add) { // merge add with segment
+        static T merge_with_add(const T& a, const T& add) { // merge add with segment
             // seg = merge_with(seg, add)
             return a + add;
         }
@@ -73,7 +73,9 @@ namespace SegmentTree {
                   tree_(size_ << 2, base_value),
                   add_(size_ << 2, base_add_value),
                   push_(size_ << 2, base_value),
-                  push_used_(size_ << 2, false) {}
+                  push_used_(size_ << 2, false) {
+            Build(1, 0, size_ - 1);
+        }
 
         explicit SegTree(std::vector<T>& data)
                 : size_(data.size()),
@@ -97,6 +99,17 @@ namespace SegmentTree {
         }
 
     private:
+        void Build(int v, int l, int r) {
+            if (l == r) {
+                return;
+            }
+            int mid = (l + r) >> 1;
+            Build(v << 1, l, mid);
+            Build(v << 1 | 1, mid + 1, r);
+            tree_[v] = merge(tree_[v], tree_[v << 1]);
+            tree_[v] = merge(tree_[v], tree_[v << 1 | 1]);
+        }
+
         void Build(int v, int l, int r, std::vector<T>& data) {
             if (l == r) {
                 tree_[v] = data[l];
