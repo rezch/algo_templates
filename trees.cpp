@@ -101,25 +101,28 @@ namespace SegmentTree {
     private:
         void Build(int v, int l, int r) {
             if (l == r) {
+                tree_[v] = base_value;
+                add_[v] = base_add_value;
                 return;
             }
             int mid = (l + r) >> 1;
             Build(v << 1, l, mid);
             Build(v << 1 | 1, mid + 1, r);
-            tree_[v] = merge(tree_[v], tree_[v << 1]);
-            tree_[v] = merge(tree_[v], tree_[v << 1 | 1]);
+            add_[v] = merge(add_[v << 1], add_[v << 1 | 1]);
+            tree_[v] = merge(tree_[v << 1], tree_[v << 1 | 1]);
         }
 
         void Build(int v, int l, int r, std::vector<T>& data) {
             if (l == r) {
                 tree_[v] = data[l];
+                add_[v] = base_add_value;
                 return;
             }
             int mid = (l + r) >> 1;
             Build(v << 1, l, mid, data);
             Build(v << 1 | 1, mid + 1, r, data);
-            tree_[v] = merge(tree_[v], tree_[v << 1]);
-            tree_[v] = merge(tree_[v], tree_[v << 1 | 1]);
+            add_[v] = merge(add_[v << 1], add_[v << 1 | 1]);
+            tree_[v] = merge(tree_[v << 1], tree_[v << 1 | 1]);
         }
 
         void Push(int v, int l, int r) {
