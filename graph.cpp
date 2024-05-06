@@ -666,30 +666,31 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
     using T = int64_t;
     // tree nodes type
 
-    T negative_value = {};
-    // such value that combines(X, negative_value) == X
+    T base_value = {}; // such value that combines(X, negative_value) == X
     // using in get for empty returns
 
-    T base_add_value = {};
-    // such value that add_merge(node, base_val) = node
+    T base_add_value = {}; // such value that add_merge(node, base_val) = node
     // using to fill segment add value to default
 
-    T merge(const T& a, const T& b) {
-        // using to merge two segments
+    static T merge(const T& a, const T& b) { // using to merge two segments
         // seg = merge(seg_left, seg_right)
         return a + b;
     }
 
-    T mapping(const T& a, int k) {
-        // using to get value on segment that contains k equals values
+    static T mapping(const T& a, int k) { // using to get value on segment that contains k equals values
         // seg = [ val, val, ..., val - k times ] -> seg = mapping(val, k)
         return a * k;
     }
 
-    T add_merge(const T& a, const T& b) { // merging values that adding to nodes segments
+    static T add_merge(const T& a, const T& b) { // merging values that adding to nodes segments
         // using to merge segment add_
         // seg_add = add_merge(seg_add_left + seg_add_right)
         return a + b;
+    }
+
+    static T merge_with_add(const T& a, const T& add) { // merge add with segment
+        // seg = merge_with(seg, add)
+        return a + add;
     }
 
     // ************************ inner function ************************
@@ -708,8 +709,8 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
         int mid = (l + r) >> 1;
         STBuild(v << 1, l, mid);
         STBuild(v << 1 | 1, mid + 1, r);
-        tree_[v] = merge(tree_[v], tree_[v << 1]);
-        tree_[v] = merge(tree_[v], tree_[v << 1 | 1]);
+        add_[v] = merge(add_[v << 1], add_[v << 1 | 1]);
+        tree_[v] = merge(tree_[v << 1], tree_[v << 1 | 1]);
     }
 
     void STPush(int v, int l, int r) {
@@ -726,13 +727,13 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
             add_[v << 1] = add_merge(add_[v << 1], add_[v]);
             add_[v << 1 | 1] = add_merge(add_[v << 1 | 1], add_[v]);
         }
-        tree_[v] = merge(tree_[v], mapping(add_[v], r - l + 1));
+        tree_[v] = merge_with_add(tree_[v], mapping(add_[v], r - l + 1));
         add_[v] = base_add_value;
     }
 
     T STGet(int v, int tl, int tr, int l, int r) {
         STPush(v, tl, tr);
-        if (l > r) { return negative_value; }
+        if (l > r) { return base_value; }
         if (l == tl && r == tr) { return tree_[v]; }
         int mid = (tl + tr) >> 1;
         return merge(
@@ -886,7 +887,7 @@ namespace HLD { // preproccessing O(n), operations O(log^2(n))
     }
 
     T Get(int a, int b) { // get sum of values from all vertexes on way a-b
-        T ans = negative_value;
+        T ans = base_value;
         _up_get(a, b, ans);
         _up_get(b, a, ans);
         if (!ancestor(a, b)) {
