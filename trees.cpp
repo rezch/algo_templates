@@ -155,7 +155,7 @@ namespace SegmentTree {
             );
         }
 
-        void Set(int v, int tl, int tr, int l, int r, T value) {
+        void Set(int v, int tl, int tr, int l, int r, T& value) {
             Push(v, tl, tr);
             if (l > r) { return; }
             if (l == tl && r == tr) {
@@ -171,7 +171,7 @@ namespace SegmentTree {
             tree_[v] = merge(tree_[v << 1], tree_[v << 1 | 1]);
         }
 
-        void Add(int v, int tl, int tr, int l, int r, T value) {
+        void Add(int v, int tl, int tr, int l, int r, T& value) {
             Push(v, tl, tr);
             if (l > r) { return; }
             if (l == tl && r == tr) {
