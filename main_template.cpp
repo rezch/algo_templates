@@ -1,52 +1,53 @@
-#ifndef UwU
 #pragma GCC optimize ("Ofast,unroll-loops")
+#ifndef UwU
 #endif
 
 #include <bits/stdc++.h>
 
 #define timer(func, ...) { \
-        auto start_time = std::chrono::steady_clock::now(); \
-        func(__VA_ARGS__);            \
-        auto end_time = std::chrono::steady_clock::now();   \
-        auto elapsed_ns = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time); \
-        std::cout << "Time elapsed: " << elapsed_ns.count() << " ms\n";                                 \
+        auto start_time_inner = std::chrono::steady_clock::now(); \
+        (func)(__VA_ARGS__);            \
+        auto end_time_inner = std::chrono::steady_clock::now();   \
+        auto elapsed_ns_inner = std::chrono::duration_cast<std::chrono::milliseconds> \
+        (end_time_inner - start_time_inner); \
+        std::cout << "Time elapsed: " << elapsed_ns_inner.count() << " ms\n";                                 \
         }
 #define test(test_count, func, ...) { \
-        for (int i = 0; i < test_count; ++i) { \
-            timer(func, __VA_ARGS__);        \
+        for (int i_inner = 0; i_inner < (test_count); ++i_inner) { \
+            timer((func), __VA_ARGS__);        \
         }}
 #define ifout(statement, ok_msg, other_msg) {                \
-        if (statement) { std::cout << ok_msg << std::endl; } \
-        else { std::cout << other_msg << std::endl; } }
+        if (statement) { std::cout << (ok_msg) << std::endl; } \
+        else { std::cout << (other_msg) << std::endl; } }
 #define solve_t(func) { \
-        int t; in >> t;      \
-        for (int i = 0; i < t; ++i) { func(); }}
+        int t_inner; in >> t_inner;      \
+        for (int i_inner = 0; i_inner < t_inner; ++i_inner) { (func)(); }}
 #define fast std::cin.tie(0); \
         std::cout.tie(0); \
         std::ios_base::sync_with_stdio(0);
 #define rrng(var, from, to) \
-        for (int var = from; var >= to; --var)
+        for (int (var) = (from); (var) >= (to); --(var))
 #define arng(var, from, to) \
-        for (int var = from; var < to; ++var)
+        for (int (var) = (from); (var) < (to); ++(var))
 #define mrng(vara, varb, ind1, ind2) \
-        rng(vara, ind1) rng(varb, ind2)
+        rng((vara), (ind1)) rng((varb), (ind2))
 #define iter(var, list) \
-        for (auto& var : list)
+        for (auto& (var) : (list))
 #define rng(var, to) \
-        arng(var, 0, to)
-#define clr(list, size) std::memset(&list, 0, sizeof(list[0]) * size);
-#define input(list) iter(var, list) { std::cin >> var; }
-#define precision(n) std::fixed << std::setprecision(n)
-#define sort_(list) std::sort(list.begin(), list.end())
-#define writef(filename) freopen(filename, "w", stdout);
-#define readf(filename) freopen(filename, "r", stdin);
-#define ret(x) std::cout << x << std::endl; return;
-#define rall(list) list.rbegin(), list.rend()
+        arng((var), 0, (to))
+#define clr(list, size) std::memset(&(list), 0, sizeof((list)[0]) * (size));
+#define input(list) iter((var), (list)) { std::cin >> (var); }
+#define precision(n) std::fixed << std::setprecision((n))
+#define sort_(list) std::sort((list).begin(), (list).end())
+#define writef(filename) freopen((filename), "w", stdout);
+#define readf(filename) freopen((filename), "r", stdin);
+#define ret(x) std::cout << (x) << std::endl; return;
+#define rall(list) (list).rbegin(), (list).rend()
 #define retn std::cout << std::endl; return;
-#define all(list) list.begin(), list.end()
-#define lcm(x, y) (x * y / std::__gcd(x, y))
-#define gcd(x, y) std::__gcd(x, y)
-#define sw(a, b) std::swap(a, b);
+#define all(list) (list).begin(), (list).end()
+#define lcm(x, y) ((x) * (y) / std::__gcd((x), (y)))
+#define gcd(x, y) std::__gcd((x), (y))
+#define sw(a, b) std::swap((a), (b));
 #define cauto const auto&
 #define mp std::make_pair
 #define eb emplace_back
@@ -85,7 +86,7 @@ typedef vt<int> vi;
 typedef pt<int> pi;
 
 template <class T> void print(T& list, char splitter = ' ')
-{ for (const auto& value : list) { std::cout << value << splitter; } }
+{ for (const auto& value : list) { std::cout << value << splitter; } std::cout << std::endl; }
 
 void read() { }
 template <class T> void read_(T& value) { std::cin >> value; }
