@@ -25,7 +25,7 @@ namespace DSUsize {
         sz[a] += sz[b];
     }
 
-    inline bool same(int a, int b) {
+    inline bool same(int a, int b) { // O(1)
         return head(a) == head(b);
     }
 }
@@ -55,10 +55,59 @@ namespace DSUrank {
         p[b] = a;
     }
 
-    inline bool same(int a, int b) {
+    inline bool same(int a, int b) { // O(1)
         return head(a) == head(b);
     }
 }
+
+
+namespace DSUrollback { // O(log(n))
+    constexpr int SIZE = (1 << 19);
+
+    int p[SIZE], sz[SIZE];
+    std::stack<std::pair<int&, int>> hist;
+    int count;
+
+    void init(int size) { // O(n)
+        while (!hist.empty()) {hist.pop(); }
+        count = size;
+        for (int i = 0; i < size; ++i) {
+            p[i] = i;
+            sz[i] = 1;
+        }
+    }
+
+    int head(int x) {
+        return (x == p[x] ? x : head(p[x]));
+    }
+
+    void unite(int a, int b) { // O(a(i)) ~ O(1)
+        a = head(a); b = head(b);
+        if (a == b) { return; }
+        if (sz[a] < sz[b]) { std::swap(a, b); }
+        hist.push({ sz[a], sz[a] });
+        hist.push({ p[b], p[b] });
+        p[b] = a;
+        sz[a] += sz[b];
+        --count;
+    }
+
+    void rollback(int until) {
+        count += ((int)hist.size() - until) >> 1;
+        while (hist.size() > until) {
+            hist.top().first = hist.top().second;
+            hist.pop();
+        }
+    }
+
+    int snapshot() {
+        return (int)hist.size();
+    }
+
+    inline bool same(int a, int b) {
+        return head(a) == head(b);
+    }
+};
 
 
 namespace DFS {
