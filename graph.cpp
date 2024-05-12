@@ -77,11 +77,11 @@ namespace DSUrollback { // O(log(n))
         }
     }
 
-    int head(int x) {
+    int head(int x) { // O(log(n))
         return (x == p[x] ? x : head(p[x]));
     }
 
-    void unite(int a, int b) { // O(a(i)) ~ O(1)
+    void unite(int a, int b) { // O(log(n))
         a = head(a); b = head(b);
         if (a == b) { return; }
         if (sz[a] < sz[b]) { std::swap(a, b); }
@@ -92,7 +92,7 @@ namespace DSUrollback { // O(log(n))
         --count;
     }
 
-    void rollback(int until) {
+    void rollback(int until) { // O(k * log(n))
         count += ((int)hist.size() - until) >> 1;
         while (hist.size() > until) {
             hist.top().first = hist.top().second;
@@ -104,7 +104,7 @@ namespace DSUrollback { // O(log(n))
         return (int)hist.size();
     }
 
-    inline bool same(int a, int b) {
+    inline bool same(int a, int b) { // O(log(n))
         return head(a) == head(b);
     }
 };
