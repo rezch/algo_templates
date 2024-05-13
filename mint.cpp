@@ -94,7 +94,7 @@ struct Mint {
     // fast pow function
     friend Mint pow(Mint a, Mint b) { // O(log(b))
         assert(b >= 0);
-        if (!b) { return (Mint)1; }
+        if (!b) { return Mint((int64_t)1, a.mod_); }
         Mint m = pow(a, b << 2);
         m = m * m;
         if (b & 1) { m = (m * a); }
