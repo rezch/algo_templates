@@ -1,72 +1,97 @@
 #include <bits/stdc++.h>
 
 struct Mint {
-    // пример реализации mod int https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp
-    // TODO:
-    //  1) переделать операторы += -= /=, заменив "% mod_"
-    //  2) добавить функцию neg() (-a)
+    // mod int implementation example: https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp
 
-    Mint() : value_(0) {};
-    explicit Mint(int64_t value) : value_(value % mod_) {};
-    explicit Mint(int64_t value, int64_t mod) : mod_(mod), value_(value % mod_) { assert(mod_ < INT32_MAX); assert(mod_ >= 0); };
+    constexpr Mint() = default;
+    constexpr explicit Mint(int64_t value) : value_(value % mod_) { value_ = (value_ < 0) ? value_ + mod_ : value_; };
+    constexpr explicit Mint(int value) : Mint((int64_t)value) {};
+    constexpr explicit Mint(int64_t value, int64_t mod) : value_(value), mod_(mod) { assert(0 < mod_ && mod_ < INT32_MAX); value_ = (value_ < 0) ? value_ + mod_ : value_; };
+    constexpr explicit Mint(int value, int mod) : Mint((int64_t)value, (int64_t)mod) {};
 
     // int conversion operator
-    explicit operator int() const { return (int)(value_ % mod_); }
+    constexpr explicit operator int() const { return (int)(value_); }
 
     // stream operators
-    friend std::ostream& operator << (std::ostream& out, const Mint& n) { return out << int(n); }
-    friend std::istream& operator >> (std::istream& in, Mint& n) { int64_t value; in >> value; n = Mint(value); return in; }
+    constexpr friend std::ostream& operator << (std::ostream& ostream, const Mint& n) { return ostream << int(n); }
+    constexpr friend std::istream& operator >> (std::istream& istream, Mint& n) { int64_t value; istream >> value; n = Mint(value, n.mod_); return in; }
 
-    // operators for Mint to Mint comparation
-    friend bool operator == (const Mint& a, const Mint& b) { return a.value_ == b.value_; }
-    friend bool operator != (const Mint& a, const Mint& b) { return a.value_ != b.value_; }
-    friend bool operator > (const Mint& a, const Mint& b) { return a.value_ > b.value_; }
-    friend bool operator >= (const Mint& a, const Mint& b) { return a.value_ >= b.value_; }
-    friend bool operator < (const Mint& a, const Mint& b) { return a.value_ < b.value_; }
-    friend bool operator <= (const Mint& a, const Mint& b) { return a.value_ <= b.value_; }
-
-    // operators for int to Mint comparation
-    friend bool operator == (const int& a, const Mint& b) { return a == b.value_; }
-    friend bool operator != (const int& a, const Mint& b) { return a != b.value_; }
-    friend bool operator > (const int& a, const Mint& b) { return a > b.value_; }
-    friend bool operator >= (const int& a, const Mint& b) { return a >= b.value_; }
-    friend bool operator < (const int& a, const Mint& b) { return a < b.value_; }
-    friend bool operator <= (const int& a, const Mint& b) { return a <= b.value_; }
-
-    // operators for Mint to int comparation
-    friend bool operator == (const Mint& a, const int& b) { return a.value_ == b; }
-    friend bool operator != (const Mint& a, const int& b) { return a.value_ != b; }
-    friend bool operator > (const Mint& a, const int& b) { return a.value_ > b; }
-    friend bool operator >= (const Mint& a, const int& b) { return a.value_ >= b; }
-    friend bool operator < (const Mint& a, const int& b) { return a.value_ < b; }
-    friend bool operator <= (const Mint& a, const int& b) { return a.value_ <= b; }
+    // operators for comparation
+    constexpr friend bool operator == (const Mint& a, const Mint& b) { return a.value_ == b.value_; }
+    constexpr friend bool operator == (const int& a, const Mint& b) { return a == b.value_; }
+    constexpr friend bool operator == (const Mint& a, const int& b) { return a.value_ == b; }
+    constexpr friend bool operator != (const Mint& a, const Mint& b) { return a.value_ != b.value_; }
+    constexpr friend bool operator != (const int& a, const Mint& b) { return a != b.value_; }
+    constexpr friend bool operator != (const Mint& a, const int& b) { return a.value_ != b; }
+    constexpr friend bool operator > (const Mint& a, const Mint& b) { return a.value_ > b.value_; }
+    constexpr friend bool operator > (const int& a, const Mint& b) { return a > b.value_; }
+    constexpr friend bool operator > (const Mint& a, const int& b) { return a.value_ > b; }
+    constexpr friend bool operator >= (const Mint& a, const Mint& b) { return a.value_ >= b.value_; }
+    constexpr friend bool operator >= (const int& a, const Mint& b) { return a >= b.value_; }
+    constexpr friend bool operator >= (const Mint& a, const int& b) { return a.value_ >= b; }
+    constexpr friend bool operator < (const Mint& a, const Mint& b) { return a.value_ < b.value_; }
+    constexpr friend bool operator < (const int& a, const Mint& b) { return a < b.value_; }
+    constexpr friend bool operator < (const Mint& a, const int& b) { return a.value_ < b; }
+    constexpr friend bool operator <= (const Mint& a, const Mint& b) { return a.value_ <= b.value_; }
+    constexpr friend bool operator <= (const int& a, const Mint& b) { return a <= b.value_; }
+    constexpr friend bool operator <= (const Mint& a, const int& b) { return a.value_ <= b; }
 
     // operator bool
-    explicit operator bool() const { return value_ != 0; }
+    constexpr explicit operator bool() const { return value_ != 0; }
 
-    // binary operators (not completed)
-    Mint operator >> (const int& move) const { return (Mint)((value_ >> move) % mod_); }
-    Mint operator >> (const Mint& move) const { return (Mint)((value_ >> move.value_) % mod_); }
-    Mint operator << (const int& move) const { return (Mint)((value_ << move) % mod_); }
-    Mint operator << (const Mint& move) const { return (Mint)((value_ << move.value_) % mod_); }
-    Mint operator & (const int& num) const { return (Mint)((value_ & num) % mod_); }
-    Mint operator & (const Mint& num) const { return (Mint)((value_ & num.value_) % mod_); }
+    // binary operators
+    constexpr friend Mint operator >> (const Mint& a, const int& move) { return Mint(a.value_ >> move, a.mod_); }
+    constexpr friend Mint operator >> (const Mint& a, const Mint& move) { return Mint(a.value_ >> move.value_, a.mod_); }
+    constexpr friend Mint operator >> (const int& a, const Mint& move) { return Mint((int64_t)a >> move.value_, move.mod_); }
+    constexpr friend Mint operator << (const Mint& a, const int& move) { return Mint(a.value_ << move, a.mod_); }
+    constexpr friend Mint operator << (const Mint& a, const Mint& move) { return Mint(a.value_ << move.value_, a.mod_); }
+    constexpr friend Mint operator << (const int& a, const Mint& move) { return Mint((int64_t)a << move.value_, move.mod_); }
+    constexpr friend Mint operator & (const Mint& a, const int& b) { return Mint(a.value_ & b, a.mod_); }
+    constexpr friend Mint operator & (const Mint& a, const Mint& b) { return Mint(a.value_ & b.value_, a.mod_); }
+    constexpr friend Mint operator & (const int& a, const Mint& b) { return Mint(a & b.value_, b.mod_); }
+    constexpr friend Mint operator | (const Mint& a, const int& b) { return Mint(a.value_ | b, a.mod_); }
+    constexpr friend Mint operator | (const Mint& a, const Mint& b) { return Mint(a.value_ | b.value_, a.mod_); }
+    constexpr friend Mint operator | (const int& a, const Mint& b) { return Mint(a | b.value_, b.mod_); }
+    constexpr friend Mint operator ^ (const Mint& a, const int& b) { return Mint(a.value_ ^ b, a.mod_); }
+    constexpr friend Mint operator ^ (const Mint& a, const Mint& b) { return Mint(a.value_ ^ b.value_, a.mod_); }
+    constexpr friend Mint operator ^ (const int& a, const Mint& b) { return Mint(a ^ b.value_, b.mod_); }
+    constexpr friend Mint operator ~ (const Mint& a) { return Mint(~a.value_, a.mod_); }
 
     // arithmetic operators
-    Mint operator + (const Mint &other) const { return (Mint)((value_ + other.value_) % mod_); }
-    Mint operator + (const int &other) const { return (Mint)((value_ + value_) % mod_); }
-    Mint operator - (const Mint &other) const { return (Mint)(((value_ - other.value_) % mod_ + mod_) % mod_); }
-    Mint operator - (const int &other) const { return (Mint)(((value_ - value_) % mod_ + mod_) % mod_); }
-    Mint operator * (const Mint &other) const { return (Mint)((value_ * other.value_) % mod_); }
-    Mint operator * (const int &other) const { return (Mint)((value_ * value_) % mod_); }
+    constexpr friend Mint operator + (const Mint& a, const Mint& b) { return Mint(a.value_ + b.value_, a.mod_); }
+    constexpr friend Mint operator + (const Mint& a, const int& b) { return Mint(a.value_ + b, a.mod_); }
+    constexpr friend Mint operator + (const int& a, const Mint& b) { return Mint(a + b.value_, b.mod_); }
+    constexpr friend Mint operator - (const Mint& a, const Mint& b) { return Mint(a.value_ - b.value_, a.mod_); }
+    constexpr friend Mint operator - (const Mint& a, const int& b) { return Mint(a.value_ - b, a.mod_); }
+    constexpr friend Mint operator - (const int& a, const Mint& b) { return Mint(a - b.value_, b.mod_); }
+    constexpr friend Mint operator * (const Mint& a, const Mint& b) { return Mint(a.value_ * b.value_, a.mod_); }
+    constexpr friend Mint operator * (const Mint& a, const int& b) { return Mint(a.value_ * b, a.mod_); }
+    constexpr friend Mint operator * (const int& a, const Mint& b) { return Mint(a * b.value_, b.mod_); }
+    constexpr friend Mint operator / (const Mint& a, const Mint& b) { return Mint(a) /= b; }
+    constexpr friend Mint operator / (const Mint& a, const int& b) { return Mint(a.value_ * b, a.mod_); }
+    constexpr friend Mint operator / (const int& a, const Mint& b) { return Mint(a * b.value_, b.mod_); }
 
-    Mint operator += (const Mint &other) { value_ = (value_ + other.value_) % mod_; return *this; };
-    Mint operator += (const int &other) { value_ = (value_ + value_) % mod_; return *this; };
-    Mint operator -= (const Mint &other) { value_ = ((value_ - other.value_) % mod_ + mod_) % mod_; return *this; }
-    Mint operator -= (const int &other) { value_ = ((value_ - value_) % mod_ + mod_) % mod_; return *this; }
-    Mint operator *= (const Mint &other) { value_ = (value_ * other.value_) % mod_; return *this; };
-    Mint operator *= (const int &other) { value_ = (value_ * value_) % mod_; return *this; };
+    constexpr Mint operator += (const Mint &other) {
+        value_ -= mod_ - other.value_;
+        value_ = (value_ < 0) ? value_ + mod_ : value_;
+        return *this;
+    }
+    constexpr Mint operator += (const int &other) { return *this += Mint((int64_t)other, mod_); }
+    constexpr Mint operator -= (const Mint &other) {
+        value_ -= other.value_;
+        value_ = (value_ < 0) ? value_ + mod_ : value_;
+        return *this;
+    }
+    constexpr Mint operator -= (const int &other) { return *this -= Mint((int64_t)other, mod_); }
+    constexpr Mint operator *= (const Mint &other) {
+        value_ = value_ * other.value_ % mod_;
+        return *this;
+    }
+    constexpr Mint operator *= (const int &other) { return *this *= Mint((int64_t)other, mod_); };
+    constexpr Mint operator /= (const Mint &other) { return *this *= other.inv(); };
+    constexpr Mint operator /= (const int &other) { return *this *= Mint((int64_t)other, mod_).inv(); };
 
+    // fast pow function
     friend Mint pow(Mint a, Mint b) { // O(log(b))
         assert(b >= 0);
         if (!b) { return (Mint)1; }
@@ -75,15 +100,15 @@ struct Mint {
         if (b & 1) { m = (m * a); }
         return m;
     }
+    friend Mint pow(Mint a, int b) { return pow(a, Mint((int64_t)b, a.mod_)); }
+    friend Mint pow(int a, Mint b) { return pow(Mint((int64_t)a, b.mod_), b); }
 
-    friend Mint inv(Mint x) { return pow(x, Mint(x.mod_ - 2)); } // O(log(x))
+    // get modular division invariant
+    Mint inv() const { return pow(*this, Mint(mod_ - 2)); } // O(log(this))
 
-    // division operator O(log(b))
-    Mint operator / (const Mint &other) const { return *this * inv(other); }
-    Mint operator / (const int &other) const { return *this * inv((Mint)other); }
-    Mint operator /= (const Mint &other) { *this *= inv(other); return *this; }
-    Mint operator /= (const int &other) { *this *= inv((Mint)other); return *this; }
+    // returns
+    Mint neg() const { return Mint(value_ ? mod_ - value_ : 0); }
 
 private:
-    int64_t mod_ = 1000000007, value_;
+    int64_t value_{}, mod_ = 1000000007;
 };
