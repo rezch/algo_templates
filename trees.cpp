@@ -480,3 +480,49 @@ namespace Treap {
     };
 }
 
+
+namespace Trie {
+    constexpr int K = 26;
+
+    struct Node {
+        int terminated = 0;
+        int count = 0;
+        Node *to[K] = {nullptr};
+    };
+
+    Node* root = new Node();
+
+    void addWord(const std::string &s) {
+        Node* curr = root;
+        for (char c: s) {
+            c -= 'a';
+            if (!curr->to[c]) {
+                curr->to[c] = new Node();
+            }
+            ++curr->count;
+            curr = curr->to[c];
+        }
+        ++curr->count;
+        ++curr->terminated;
+    }
+
+    std::string getKth(int k) {
+        std::string res;
+        Node* curr = root;
+        while (k > 0) {
+            int next = -1;
+            int cnt = 0;
+            for (int i = 0; i < K && cnt < k; ++i) {
+                if (curr->to[i]) {
+                    cnt += curr->to[i]->count;
+                    next = i;
+                }
+            }
+            if (next == -1) { break; }
+            k -= cnt - curr->to[next]->count + curr->to[next]->terminated;
+            res += char(next + 'a');
+            curr = curr->to[next];
+        }
+        return res;
+    }
+}
