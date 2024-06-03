@@ -1,5 +1,5 @@
-#pragma GCC optimize ("Ofast,unroll-loops")
 #ifndef UwU
+#pragma GCC optimize ("Ofast,unroll-loops")
 #endif
 
 #include <bits/stdc++.h>
@@ -10,7 +10,7 @@
         auto end_time_inner = std::chrono::steady_clock::now();   \
         auto elapsed_ns_inner = std::chrono::duration_cast<std::chrono::milliseconds> \
         (end_time_inner - start_time_inner); \
-        std::cout << "Time elapsed: " << elapsed_ns_inner.count() << " ms\n";                                 \
+        std::cout << "Time elapsed: " << elapsed_ns_inner.count() << " ms\n"; \
         }
 #define test(test_count, func, ...) { \
         for (int i_inner = 0; i_inner < (test_count); ++i_inner) { \
