@@ -45,7 +45,7 @@
 #define rall(list) (list).rbegin(), (list).rend()
 #define retn std::cout << std::endl; return;
 #define all(list) (list).begin(), (list).end()
-#define lcm(x, y) ((x) * (y) / std::__gcd((x), (y)))
+#define lcm(x, y) ((x) / std::__gcd((x), (y)) * (y))
 #define gcd(x, y) std::__gcd((x), (y))
 #define sw(a, b) std::swap((a), (b));
 #define cauto const auto&
