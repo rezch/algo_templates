@@ -58,7 +58,7 @@ namespace combinatorics {
         return pow(x, mod - 2);
     }
 
-    int64_t nCr(int64_t n, int64_t r) { // number if combinations
+    int64_t nCr(int64_t n, int64_t r) { // combinations
         assert(n >= r);
         int64_t n1 = fac32(n), d1 = inv(fac32(n - r)), d2 = inv(fac32(r));
         d1 = (d1 * d2) % mod;
