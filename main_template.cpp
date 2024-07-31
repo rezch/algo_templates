@@ -16,9 +16,9 @@
         for (int i_inner = 0; i_inner < (test_count); ++i_inner) { \
             timer((func), __VA_ARGS__);        \
         }}
-#define ifout(statement, ok_msg, other_msg) {                \
-        if (statement) { std::cout << (ok_msg) << std::endl; } \
-        else { std::cout << (other_msg) << std::endl; } }
+#define ifout(statement, ok_msg, bad_msg) {                \
+        if ((statement)) { std::cout << (ok_msg) << std::endl; } \
+        else { std::cout << (bad_msg) << std::endl; } }
 #define solve_t(func) { \
         int t_inner; in >> t_inner;      \
         for (int i_inner = 0; i_inner < t_inner; ++i_inner) { (func)(); }}
@@ -36,6 +36,8 @@
 #define rng(var, to) \
         arng((var), 0, (to))
 #define clr(list, size) std::memset(&(list), 0, sizeof((list)[0]) * (size));
+#define force_clr(list, size) rng(inner_i, (size)) { (list)[inner_i] = 0; }
+#define rsort_(list) std::sort((list).rbegin(), (list).rend());
 #define input(list) iter((var), (list)) { std::cin >> (var); }
 #define precision(n) std::fixed << std::setprecision((n))
 #define sort_(list) std::sort((list).begin(), (list).end())
@@ -56,23 +58,26 @@
 #define pb push_back
 #define in std::cin
 
-template <class T> bool set_max(T& a, T b)
-{ { if (a >= b) return false; } { a = b; return true; } }
-template <class T> bool set_min(T& a, T b)
-{ { if (a <= b) return false; } { a = b; return true; } }
+template <class T, class W> bool set_max(T& a, W b)
+{ { if (a >= (T)b) return false; } { a = b; return true; } }
+template <class T, class W> bool set_min(T& a, W b)
+{ { if (a <= (T)b) return false; } { a = b; return true; } }
 
-int topbit(int x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); } // 0 -> -1
-int lowbit(int x) { return (x == 0 ? -1 : __builtin_ctz(x)); } // 0 -> -1
-int popcnt(int x) { return __builtin_popcount(x); }
+template <class T> T topbit(T x) { return (x == 0 ? -1 : 63 - __builtin_clzll(0LL + x)); } // 0 -> -1
+template <class T> T lowbit(T x) { return (x == 0 ? -1 : __builtin_ctzll(0LL + x)); } // 0 -> -1
+template <class T> T popcnt(T x) { return __builtin_popcountll(0LL + x); }
 template <typename T, typename U> T ceil(T x, U y)
 { return (x > 0 ? (x + y - 1) / y : x / y); }
 template <typename T, typename U> T floor(T x, U y)
 { return (x > 0 ? x / y : (x - y + 1) / y); }
 
+#define int int64_t
+
 template <class T, class U> using umtt = std::unordered_map<T, U>;
 template <class T> using vvt = std::vector<std::vector<T>>;
 template <class T, class U> using ptt = std::pair<T, U>;
 template <class T> using umt = std::unordered_map<T, T>;
+template <class T> using ust = std::unordered_set<T>;
 template <class T> using mst = std::multiset<T>;
 template <class T> using pt = std::pair<T, T>;
 template <class T> using vt = std::vector<T>;
@@ -85,10 +90,10 @@ typedef vvt<int> vvi;
 typedef vt<int> vi;
 typedef pt<int> pi;
 
-template <class T> void print(T& list, char splitter = ' ')
-{ auto end = --list.end(); for(auto it = list.begin(); it != list.end(); ++it)
-{ std::cout << *it << (it != end ? splitter : '\n'); } }
-
+template <class T, class S=char> void print(T& list, S splitter = ' ')
+{ if (list.empty()) { std::cout << std::endl; return; }
+    auto it = list.begin(), end = --(list.end()); for (; it != end; ++it) {
+        std::cout << *it << splitter; } std::cout << *it << std::endl; }
 
 void read() { }
 template <class T> void read_(T& value) { std::cin >> value; }
