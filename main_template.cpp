@@ -86,7 +86,9 @@ typedef vt<int> vi;
 typedef pt<int> pi;
 
 template <class T> void print(T& list, char splitter = ' ')
-{ for (const auto& value : list) { std::cout << value << splitter; } std::cout << std::endl; }
+{ auto end = --list.end(); for(auto it = list.begin(); it != list.end(); ++it)
+{ std::cout << *it << (it != end ? splitter : '\n'); } }
+
 
 void read() { }
 template <class T> void read_(T& value) { std::cin >> value; }
