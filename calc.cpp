@@ -116,3 +116,73 @@ namespace matrix {
     };
 }
 
+
+namespace Primes {
+    constexpr int MAX = (1 << 16);
+    typedef uint32_t prime_type;
+
+    bool is_prime[MAX + 1];
+    std::vector<prime_type> primes;
+
+    void init() {
+        static bool initialized = false;
+        if (initialized) { return; }
+        initialized = true;
+
+        for (auto& x : is_prime) {
+            x = true;
+        }
+        is_prime[0] = is_prime[1] = false;
+        for (prime_type i = 2; i * i <= MAX; ++i) {
+            if (is_prime[i]) {
+                for (prime_type k = i * i; k <= MAX; k += i) {
+                    is_prime[k] = false;
+                }
+            }
+        }
+        for (prime_type i = 2; i <= MAX; ++i) {
+            if (is_prime[i]) { primes.push_back(i); }
+        }
+    }
+
+    prime_type gen_prime_divs(prime_type n) {
+        static prime_type value = n, last_used{};
+        static auto it = primes.begin();
+        if (last_used != n) { last_used = value = n; it = primes.begin(); }
+        for (; it != primes.end() && *it <= value; ) {
+            while (value % *it == 0) { value /= *it; return *it; }
+            ++it;
+        }
+        it = primes.end();
+        return (value != 1 ? value : 0);
+    }
+
+    prime_type gen_unique_prime_divs(prime_type n) {
+        static prime_type value = n, last_used{};
+        static auto it = primes.begin();
+        if (last_used != n) { last_used = value = n; it = primes.begin(); }
+        for (; it != primes.end() && *it <= value; ++it) {
+            prime_type res{};
+            if (value % *it == 0) { res = *it; }
+            while (value % *it == 0) { value /= *it; }
+            if (res) { return res; }
+        }
+        it = primes.end();
+        return (value != 1 ? value : 0);
+    }
+
+    std::vector<prime_type> get_prime_divs(prime_type n) {
+        std::vector<prime_type> res;
+        for (const auto& x : primes) {
+            if (x * x > n) { break; }
+            while (n % x == 0) {
+                res.push_back(x);
+                n /= x;
+            }
+        }
+        if (n != 1) {
+            res.push_back(n);
+        }
+        return res;
+    }
+}
