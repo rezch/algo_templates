@@ -52,9 +52,9 @@ namespace SegmentTree {
             return a + b;
         }
 
-        static T mapping(const T& a, int k) { // using to get value on segment that contains k equals values
+        static T mapping(const T& a, const T& push_value, int k) { // using to get value on segment that contains k equals values
             // seg = [ val, val, ..., val - k times ] -> seg = mapping(val, k)
-            return a * k;
+            return push_value * k;
         }
 
         static T add_merge(const T& a, const T& b) { // merging values that adding to nodes segments
@@ -127,14 +127,14 @@ namespace SegmentTree {
                     push_[v << 1] = push_[v << 1 | 1] = push_[v];
                     add_[v << 1] = add_[v << 1 | 1] = base_add_value;
                 }
-                tree_[v] = mapping(push_[v], r - l + 1);
+                tree_[v] = mapping(tree_[v], push_[v], r - l + 1);
                 push_used_[v] = false;
             }
             if (l != r) { // push add
                 add_[v << 1] = add_merge(add_[v << 1], add_[v]);
                 add_[v << 1 | 1] = add_merge(add_[v << 1 | 1], add_[v]);
             }
-            tree_[v] = merge_with_add(tree_[v], mapping(add_[v], r - l + 1));
+            tree_[v] = merge_with_add(tree_[v], mapping(tree_[v], add_[v], r - l + 1));
             add_[v] = base_add_value;
         }
 
@@ -411,7 +411,7 @@ namespace Treap {
 
     template<class T>
     struct TTreap { // Treap
-        void Insert(int key) {
+        void Insert(T key) {
             auto [leftMid, right] = Split(Root_, key);
             auto [left, middle] = Split(leftMid, key - 1);
             if (middle == -1) {
@@ -425,7 +425,7 @@ namespace Treap {
             Root_ = Merge(left, Merge(middle, right));
         };
 
-        std::optional<int> FindLowerBound(int key) {
+        std::optional<int> FindLowerBound(T key) {
             int result = -1, current = Root_;
             while (current >= 0) {
                 if (Nodes_[current].Key >= key) {
@@ -438,7 +438,7 @@ namespace Treap {
             return result == -1 ? std::nullopt : std::optional<int>(Nodes_[result].Key);
         }
 
-        bool Find(int key) const {
+        bool Find(T key) const {
             auto [leftMid, right] = Split(Root_, key);
             auto [left, middle] = Split(leftMid, key - 1);
             bool result = (middle != -1);
@@ -455,7 +455,7 @@ namespace Treap {
         int Root_ = -1;
         std::vector<Node> Nodes_;
 
-        std::pair<int, int> Split(int current, int key) {
+        std::pair<int, int> Split(int current, T key) {
             if (current == -1) { return {-1, -1}; }
             if (Nodes_[current].Key <= key) {
                 auto [left, right] = Split(Nodes_[current].Right, key);
