@@ -186,3 +186,65 @@ namespace Primes {
         return res;
     }
 }
+
+
+class Bit {
+public:
+    Bit() = default;
+    Bit(uint64_t x) : x(x) {};
+
+    template<class Os>
+    friend Os& operator << (Os& ostream, const Bit& bit) { ostream << bit.x; return ostream; }
+
+    template<class Is>
+    friend Is& operator >> (Is& istream, Bit& bit) { istream >> bit.x; return istream; }
+
+    inline uint64_t operator | (const Bit& other) const { return x | other.x; }
+    inline uint64_t operator & (const Bit& other) const { return x & other.x; }
+    inline uint64_t operator ^ (const Bit& other) const { return x ^ other.x; }
+    inline uint64_t& operator |= (const Bit& other) { x |= other.x; return x; }
+    inline uint64_t& operator &= (const Bit& other) { x &= other.x; return x; }
+    inline uint64_t& operator ^= (const Bit& other) { x ^= other.x; return x; }
+    inline uint64_t operator ~ () const { return (~x) & (uint64_t(-1) >> (1 + __builtin_clzll(x))); }
+
+    inline bool operator != (const Bit& other) const { return x != other.x; }
+    inline bool operator == (const Bit& other) const { return x == other.x; }
+    inline bool operator <= (const Bit& other) const { return x <= other.x; }
+    inline bool operator >= (const Bit& other) const { return x >= other.x; }
+    inline bool operator < (const Bit& other) const { return x < other.x; }
+    inline bool operator > (const Bit& other) const { return x > other.x; }
+
+    inline uint16_t operator[] (uint16_t index) const { return x >> index & 1; }
+
+    inline void set(uint16_t index, uint16_t value) { x = (x & (uint64_t(-1) ^ (1 << index))) | (value << index); }
+    inline uint16_t get(uint16_t index) const { return x >> index & 1; }
+
+    inline void set(uint16_t left, uint16_t right, uint16_t value) {
+        x &= (uint64_t(-1) << (right + 1)) | (uint64_t(-1) >> (64 - left));
+        if (value) { x |= ~(uint64_t(-1) << (right + 1)) | (uint64_t(-1) >> (64 - left)); }
+    }
+
+    inline uint64_t get(uint16_t left, uint16_t right) const {
+        return (x << (63 - right) >> (63 - right + left));
+    }
+
+    std::string str() const {
+        std::string result;
+        for (int i = 63 - __builtin_clzll(x); i >= 0; --i) {
+            result += (x >> i & 1) + '0';
+        }
+        return result;
+    }
+
+    operator uint64_t () const { return x; }
+    operator int64_t () const { return int64_t(x); }
+    operator std::string () const { return str(); }
+    operator bool () const { return bool(x); }
+
+    inline uint16_t topbit() const { return 63 - __builtin_clzll(x); }
+    inline uint16_t lowbit() const { return  __builtin_ctzll(x); }
+    inline uint16_t popcnt() const { return __builtin_popcountll(x); }
+
+private:
+    uint64_t x;
+};
