@@ -92,7 +92,7 @@ namespace DSUrollback { // O(log(n))
         --count;
     }
 
-    void rollback(int until) { // O(k * log(n))
+    void rollback(int until) { // O(n)
         count += ((int)hist.size() - until) >> 1;
         while (hist.size() > until) {
             hist.top().first = hist.top().second;
@@ -523,7 +523,7 @@ namespace Prime { // O(m log n)
 
     struct Edge {
         int from{}, to{}, w{};
-    } edges[MAXE];
+    };
 
     int used[MAXV];
     int64_t dist[MAXV];

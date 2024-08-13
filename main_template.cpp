@@ -5,13 +5,12 @@
 #include <bits/stdc++.h>
 
 #define timer(func, ...) { \
-        auto start_time_inner = std::chrono::steady_clock::now(); \
-        (func)(__VA_ARGS__);            \
-        auto end_time_inner = std::chrono::steady_clock::now();   \
-        auto elapsed_ns_inner = std::chrono::duration_cast<std::chrono::milliseconds> \
-        (end_time_inner - start_time_inner); \
-        std::cout << "Time elapsed: " << elapsed_ns_inner.count() << " ms\n"; \
-        }
+        auto start_time_inner = std::chrono::high_resolution_clock \
+        ::now();(func)(__VA_ARGS__);auto end_time_inner = std::chrono \
+        ::high_resolution_clock::now();auto elapsed_ns_inner = std::chrono \
+        ::duration_cast<std::chrono::duration<double>>(end_time_inner -    \
+        start_time_inner);std::cout << std::fixed << std           \
+        ::setprecision(5) << "Time elapsed: " << elapsed_ns_inner.count() << " ms\n";}
 #define test(test_count, func, ...) { \
         for (int i_inner = 0; i_inner < (test_count); ++i_inner) { \
             timer((func), __VA_ARGS__);        \
