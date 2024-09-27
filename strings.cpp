@@ -161,6 +161,7 @@ bool has(Node::value_type x) {
         if (!curr->to[c]) { return false; }
         curr = curr->to[c];
     }
+    curr->push();
     return curr->terminated;
 }
 
