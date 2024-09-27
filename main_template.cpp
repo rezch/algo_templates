@@ -97,6 +97,7 @@ template <class T, class S=char> void print(T& list, S splitter = ' ')
 template <class... T> void read(T&& ...args) { ((std::cin >> args), ...); }
 #define rt(inner_type, ...) inner_type __VA_ARGS__; read(__VA_ARGS__);
 void write_() { std::cout << std::endl; }
+void write() { std::cout << std::endl; }
 template <class T, class...U> void write_(T&& head, U&&... tail) { std::cout << ' ' << head; write_(tail...);}
 template <class T, class...U> void write(T&& head, U&&... tail) { std::cout << head; write_(tail...); }
 template <class T, class... U> void set(int n, T&& value, U&& ...args) { ((args.assign(n, value)), ...); }
@@ -105,7 +106,7 @@ template <class T, class... U> void set(int n, T&& value, U&& ...args) { ((args.
 
 
 void solve() {
-    /* UwU */
+    /* ^.^ */
 }
 
 
