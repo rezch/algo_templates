@@ -91,16 +91,16 @@ struct Node {
     int count{};
     Node* to[2] = { nullptr, nullptr };
     value_type mask{};
-    bool full{false};
+    bool full{true};
 
     void push() {
         if (!mask) { return; }
         if (mask & 1) {
             std::swap(to[0], to[1]);
         }
-        for (int i = 0; i < 2; ++i) {
-            if (!to[i]) continue;
-            to[i]->mask ^= mask >> 1;
+        for (auto&& child : to) {
+            if (!child) continue;
+            child->mask ^= mask >> 1;
         }
         mask = 0;
     }
@@ -124,10 +124,10 @@ inline Node::value_type reverse_bits(Node::value_type x) {
 
 Node* root = new Node();
 
-void updateTrie(Node * curr = root) {
-    if (curr->to[0]) updateTrie(curr->to[0]);
-    if (curr->to[1]) updateTrie(curr->to[1]);
-    curr->update();
+void updateTrie(const std::vector<Node*>& nodes) {
+    for (int i = nodes.size() - 1; i >= 0; --i) {
+        nodes[i]->update();
+    }
 }
 
 void xor_trie(Node::value_type x) {
@@ -137,8 +137,10 @@ void xor_trie(Node::value_type x) {
 
 void addWord(Node::value_type x) {
     Node* curr = root;
+    std::vector<Node*> used_nodes;
     for (int i = SIZE - 1; i >= 0; --i) {
         curr->push();
+        used_nodes.push_back(curr);
         int c = x >> i & 1;
         if (!curr->to[c]) { curr->to[c] = new Node(); }
         ++curr->count;
@@ -146,7 +148,9 @@ void addWord(Node::value_type x) {
     }
     ++curr->count;
     ++curr->terminated;
-    updateTrie();
+    curr->push();
+    used_nodes.push_back(curr);
+    updateTrie(used_nodes);
 }
 
 bool has(Node::value_type x) {
@@ -166,7 +170,7 @@ Node::value_type mex() {
     Node::value_type mex{};
     curr->push();
     for (int i = SIZE - 1; i >= 0; --i) {
-         curr->push();
+        curr->push();
         if (!curr->to[0]) break;
         if (!curr->to[0]->full) {
             curr = curr->to[0];
