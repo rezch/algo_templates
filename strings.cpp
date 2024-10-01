@@ -29,7 +29,7 @@ std::vector<int> z_function(const T &s) { // O(n)
     return z;
 }
 
-} // ZP_functions
+}; // ZP_functions
 
 
 namespace Trie {
@@ -78,7 +78,8 @@ int get(const std::string& s) {
     return curr->count;
 }
 
-} // Trie
+}; // Trie
+
 
 namespace BitTrie {
 
@@ -177,11 +178,150 @@ Node::value_type mex() {
             curr = curr->to[0];
             continue;
         }
-        mex += 1 << i;
+        mex &= 1 << i;
         curr = curr->to[1];
         if (!curr) break;
     }
     return mex;
 }
 
-} // BitTrie
+}; // BitTrie
+
+
+namespace Aho {
+
+    struct Node {
+        Node * link{};
+        Node * p{};
+        char p_ch{};
+        std::map<char, Node*> to;
+        std::map<char, Node*> go;
+        bool terminated{};
+
+        Node(char c, Node * p) : p_ch(c), p(p) {};
+    };
+
+    Node * root = new Node(-1, nullptr);
+
+    void addWord(const std::string& s) {
+        Node * curr = root;
+        for (char c : s) {
+            if (!curr->to.contains(c)) {
+                curr->to[c] = new Node(c, curr);
+            }
+            curr = curr->to[c];
+        }
+        curr->terminated = true;
+    }
+
+    Node * go(Node * v, char c);
+
+    Node * link(Node * v) {
+        if (v->link) return v->link;
+        if (v == root || v->p == root) v->link = root;
+        else v->link = go(link(v->p), v->p_ch);
+        return v->link;
+    }
+
+    Node * go(Node * v, char c) {
+        if (v->go.contains(c)) return v->go[c];
+        if (v->to.contains(c)) v->go[c] = v->to[c];
+        else if (v == root) v->go[c] = root;
+        else v->go[c] = go(link(v), c);
+        return v->go[c];
+    }
+
+    int getCount(Node * v){
+        int res{};
+        while (v != root) {
+            res += v->terminated;
+            v = link(v);
+        }
+        return res;
+    }
+
+    int countEntry(const std::string& s){
+        int res{};
+        Node * curr = root;
+        for (auto&& c : s) {
+            curr = go(curr, c - 'a');
+            res += getCount(curr);
+        }
+        return res;
+    }
+
+} // Aho
+
+
+namespace Suffauto {
+
+constexpr int SIZE = 1 << 17;
+
+struct State {
+    int len{};
+    int link{};
+    std::map<char, int> next;
+    int size{};
+    int sum{};
+    bool used{};
+};
+
+State state[SIZE << 1];
+int sz{}, last{};
+
+void init() {
+    last = 0;
+    ++sz;
+    state[0].len = 0;
+    state[0].link = -1;
+}
+
+void extend(char c) {
+    int cur = sz++;
+    state[cur].len = state[last].len + 1;
+    int p;
+    for (p = last; p != -1 && !state[p].next.count(c); p = state[p].link) {
+        state[p].next[c] = cur;
+    }
+    if (p == -1) {
+        state[cur].link = 0;
+        last = cur;
+        return;
+    }
+    int q = state[p].next[c];
+    if (state[p].len + 1 == state[q].len) {
+        state[cur].link = q;
+    }
+    else {
+        int clone = sz++;
+        state[clone].len = state[p].len + 1;
+        state[clone].next = state[q].next;
+        state[clone].link = state[q].link;
+        for (; p != -1 && state[p].next[c] == q; p = state[p].link) {
+            state[p].next[c] = clone;
+        }
+        state[q].link = state[cur].link = clone;
+    }
+    last = cur;
+}
+
+void build(const std::string& s) {
+    init();
+    for (char c : s) {
+        extend(c);
+    }
+}
+
+void sizes(int v = 0) {
+    if (state[v].used) return;
+    state[v].used = true;
+    state[v].size = 1;
+    state[v].sum = 0;
+    for (auto&& [c_to, to] : state[v].next) {
+        sizes(to);
+        state[v].size += state[to].size;
+        state[v].sum += state[to].size + state[to].sum;
+    }
+}
+
+} // Suffauto
