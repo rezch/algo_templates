@@ -190,65 +190,65 @@ Node::value_type mex() {
 
 namespace Aho {
 
-    struct Node {
-        Node * link{};
-        Node * p{};
-        char p_ch{};
-        std::map<char, Node*> to;
-        std::map<char, Node*> go;
-        bool terminated{};
+struct Node {
+    Node * link{};
+    Node * p{};
+    char p_ch{};
+    std::map<char, Node*> to;
+    std::map<char, Node*> go;
+    bool terminated{};
 
-        Node(char c, Node * p) : p_ch(c), p(p) {};
-    };
+    Node(char c, Node * p) : p_ch(c), p(p) {};
+};
 
-    Node * root = new Node(-1, nullptr);
+Node * root = new Node(-1, nullptr);
 
-    void addWord(const std::string& s) {
-        Node * curr = root;
-        for (char c : s) {
-            if (!curr->to.contains(c)) {
-                curr->to[c] = new Node(c, curr);
-            }
-            curr = curr->to[c];
+void addWord(const std::string& s) {
+    Node * curr = root;
+    for (char c : s) {
+        if (!curr->to.contains(c)) {
+            curr->to[c] = new Node(c, curr);
         }
-        curr->terminated = true;
+        curr = curr->to[c];
     }
+    curr->terminated = true;
+}
 
-    Node * go(Node * v, char c);
+Node * go(Node * v, char c);
 
-    Node * link(Node * v) {
-        if (v->link) return v->link;
-        if (v == root || v->p == root) v->link = root;
-        else v->link = go(link(v->p), v->p_ch);
-        return v->link;
+Node * link(Node * v) {
+    if (v->link) return v->link;
+    if (v == root || v->p == root) v->link = root;
+    else v->link = go(link(v->p), v->p_ch);
+    return v->link;
+}
+
+Node * go(Node * v, char c) {
+    if (v->go.contains(c)) return v->go[c];
+    if (v->to.contains(c)) v->go[c] = v->to[c];
+    else if (v == root) v->go[c] = root;
+    else v->go[c] = go(link(v), c);
+    return v->go[c];
+}
+
+int getCount(Node * v){
+    int res{};
+    while (v != root) {
+        res += v->terminated;
+        v = link(v);
     }
+    return res;
+}
 
-    Node * go(Node * v, char c) {
-        if (v->go.contains(c)) return v->go[c];
-        if (v->to.contains(c)) v->go[c] = v->to[c];
-        else if (v == root) v->go[c] = root;
-        else v->go[c] = go(link(v), c);
-        return v->go[c];
+int countEntry(const std::string& s){
+    int res{};
+    Node * curr = root;
+    for (auto&& c : s) {
+        curr = go(curr, c - 'a');
+        res += getCount(curr);
     }
-
-    int getCount(Node * v){
-        int res{};
-        while (v != root) {
-            res += v->terminated;
-            v = link(v);
-        }
-        return res;
-    }
-
-    int countEntry(const std::string& s){
-        int res{};
-        Node * curr = root;
-        for (auto&& c : s) {
-            curr = go(curr, c - 'a');
-            res += getCount(curr);
-        }
-        return res;
-    }
+    return res;
+}
 
 } // Aho
 
