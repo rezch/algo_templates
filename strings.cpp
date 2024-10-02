@@ -224,8 +224,8 @@ Node * link(Node * v) {
 }
 
 Node * go(Node * v, char c) {
-    if (v->go.contains(c)) return v->go[c];
-    if (v->to.contains(c)) v->go[c] = v->to[c];
+    if (v->go.contains(c) && v->go[c] != root) return v->go[c];
+    if (v->to.contains(c) && v->to[c] != root) v->go[c] = v->to[c];
     else if (v == root) v->go[c] = root;
     else v->go[c] = go(link(v), c);
     return v->go[c];
