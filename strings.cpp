@@ -233,9 +233,8 @@ Node * go(Node * v, char c) {
 
 int getCount(Node * v){
     int res{};
-    while (v != root) {
+    for (; v != root; v = link(v)) {
         res += v->terminated;
-        v = link(v);
     }
     return res;
 }
@@ -243,8 +242,8 @@ int getCount(Node * v){
 int countEntry(const std::string& s){
     int res{};
     Node * curr = root;
-    for (auto&& c : s) {
-        curr = go(curr, c - 'a');
+    for (char c : s) {
+        curr = go(curr, c);
         res += getCount(curr);
     }
     return res;
