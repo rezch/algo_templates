@@ -224,8 +224,8 @@ Node * link(Node * v) {
 }
 
 Node * go(Node * v, char c) {
-    if (v->go.contains(c) && v->go[c] != root) return v->go[c];
-    if (v->to.contains(c) && v->to[c] != root) v->go[c] = v->to[c];
+    if (v->go.contains(c)) return v->go[c];
+    if (v->to.contains(c)) v->go[c] = v->to[c];
     else if (v == root) v->go[c] = root;
     else v->go[c] = go(link(v), c);
     return v->go[c];
@@ -249,7 +249,151 @@ int countEntry(const std::string& s){
     return res;
 }
 
-} // Aho
+}; // Aho
+
+
+namespace DynamicAho {
+
+class DynamicAho {
+public:
+
+    DynamicAho() : aho(2) { };
+
+    void insert(const std::string& s, bool add = true)
+    {
+        aho[0].addWord(s, (add ? 1 : -1));
+        for (int i = 0; ; ++i) {
+            if (aho[i].words_count > (1 << i)) {
+                if (i + 1 == aho.size()) { aho.emplace_back(); }
+                aho[i + 1].rebuild(aho[i]);
+            } else {
+                break;
+            }
+        }
+    }
+
+    int request(const std::string& s)
+    {
+        int res{};
+        for (auto a : aho) {
+            res += a.countEntry(s);
+        }
+        return res;
+    }
+
+private:
+
+    class Aho {
+    public:
+        static constexpr int ROOT = 0;
+
+        Aho() : nodes(2)
+        {
+            nodes[ROOT] = Node(-1, 0);
+        }
+
+        void addWord(const std::string& s, int k)
+        {
+            int curr = ROOT;
+            for (auto c : s) {
+                if (!nodes[curr].to.contains(c)) {
+                    nodes[curr].to[c] = addNode(curr, c);
+                }
+                curr = nodes[curr].to[c];
+            }
+            nodes[curr].terminated += k;
+            ++words_count;
+        }
+
+        int link(int v)
+        {
+            if (nodes[v].link != -1) return nodes[v].link;
+            if (v == ROOT || nodes[v].p == ROOT) nodes[v].link = ROOT;
+            else nodes[v].link = go(link(nodes[v].p), nodes[v].pch);
+            return nodes[v].link;
+        }
+
+        int go(int v, char c)
+        {
+            if (nodes[v].go.contains(c)) return nodes[v].go[c];
+            if (nodes[v].to.contains(c)) nodes[v].go[c] = nodes[v].to[c];
+            else if (v == ROOT) nodes[v].go[c] = 0;
+            else nodes[v].go[c] = go(link(v), c);
+            return nodes[v].go[c];
+        }
+
+        int getCount(int v) {
+            int res{};
+            for (; v != ROOT; v = link(v)) {
+                res += nodes[v].terminated;
+            }
+            return res;
+        }
+
+        int countEntry(const std::string& s)
+        {
+            int res{};
+            int curr = ROOT;
+            for (auto c : s) {
+                curr = go(curr, c);
+                res += getCount(curr);
+            }
+            return res;
+        }
+
+        void rebuild(Aho& other)
+        {
+            words_count += other.words_count;
+            buildFrom(other);
+            other = Aho();
+        }
+
+        int words_count{};
+
+    private:
+        void buildFrom(const Aho& other)
+        {
+            std::queue<std::pair<int, int>> q;
+            q.push({ ROOT, ROOT });
+            while (!q.empty()) {
+                auto [v, ov] = q.front();
+                q.pop();
+                nodes[v].terminated += other.nodes[ov].terminated;
+                for (auto&& [c, to] : other.nodes[ov].to) {
+                    if (!nodes[v].to.contains(c)) {
+                        nodes[v].to[c] = addNode(v, c);
+                    }
+                    q.push({ nodes[v].to[c], to });
+                }
+            }
+        }
+
+        struct Node {
+            int p{-1};
+            char pch{};
+            int link{-1};
+            std::map<char, int> to;
+            std::map<char, int> go;
+            int terminated{};
+
+            Node() = default;
+            Node(int p, char c) : p(p), pch(c) {};
+        };
+
+        int addNode(int p, char c)
+        {
+            nodes.emplace_back(p, c);
+            return nodes.size() - 1;
+        }
+
+        std::vector<Node> nodes;
+    };
+
+    std::vector<Aho> aho;
+
+};
+
+}; // DynamicAho
 
 
 namespace Suffauto {
@@ -323,4 +467,4 @@ void sizes(int v = 0) {
     }
 }
 
-} // Suffauto
+}; // Suffauto
