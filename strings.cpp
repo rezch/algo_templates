@@ -197,7 +197,7 @@ public:
     Aho() : nodes(2)
     {
         nodes[ROOT] = Node(-1, 0);
-        nodes[ROOT].link = ROOT;
+        nodes[ROOT].cnt = 0;
     }
 
     void addWord(const std::string& s, int k)
@@ -234,7 +234,6 @@ public:
     void getCnt(int v)
     {
         if (nodes[v].cnt != -1) return;
-        nodes[v].cnt = 0;
         getCnt(link(v));
         nodes[v].cnt = nodes[nodes[v].link].cnt + nodes[v].terminated;
     }
